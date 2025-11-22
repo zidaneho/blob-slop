@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dewpu7on3b3gh"]
+[gd_scene load_steps=14 format=3 uid="uid://dewpu7on3b3gh"]
 
 [ext_resource type="Script" uid="uid://d0mt71f4h0xtm" path="res://game/managers/main.gd" id="1_tefeu"]
 [ext_resource type="Texture2D" uid="uid://cwm5p6a14hcw1" path="res://assets/textures/sky_47_2k.png" id="2_o6xl0"]
@@ -6,6 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://ca0vfyuijnxif" path="res://components/chunks/Chunk.tscn" id="4_85g3d"]
 [ext_resource type="Script" uid="uid://ds88mx2ef2hbf" path="res://data/biomes/biome_data.gd" id="5_choun"]
 [ext_resource type="Resource" uid="uid://cbwffm61r2i8y" path="res://data/biomes/spring.tres" id="6_ya4ey"]
+[ext_resource type="PackedScene" uid="uid://wuda3f5r87a3" path="res://components/chunks/Gate1Chunk.tscn" id="7_tipki"]
+[ext_resource type="PackedScene" uid="uid://dv7ysojvneigg" path="res://components/chunks/BossChunk.tscn" id="8_85g3d"]
+[ext_resource type="PackedScene" uid="uid://dilek3jtotwx3" path="res://components/chunks/Gate2Chunk.tscn" id="8_choun"]
+[ext_resource type="PackedScene" uid="uid://boqb6artg12de" path="res://components/chunks/Gate3Chunk.tscn" id="9_ya4ey"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_nqv1k"]
 panorama = ExtResource("2_o6xl0")
@@ -256,6 +260,8 @@ script = ExtResource("3_tipki")
 chunk_scene = ExtResource("4_85g3d")
 world_env = NodePath("../WorldEnvironment")
 biomes = Array[ExtResource("5_choun")]([ExtResource("6_ya4ey")])
+gate_chunk_scene = Array[PackedScene]([ExtResource("7_tipki"), ExtResource("8_choun"), ExtResource("9_ya4ey")])
+boss_chunk_scene = ExtResource("8_85g3d")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.61809283, 0.7861051, 0, -0.7861051, 0.61809283, 0, 0, 0)

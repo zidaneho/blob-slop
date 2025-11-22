@@ -1,4 +1,4 @@
-extends Node3D
+class_name Chunk extends Node3D
 
 # 1. GET REFERENCES TO YOUR NEW NODES
 @onready var ground = $Ground

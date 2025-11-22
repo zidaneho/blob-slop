@@ -25,12 +25,10 @@ transparency = 1
 albedo_texture = SubResource("GradientTexture2D_htsnb")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_lv5wf"]
-size = Vector3(4.8, 5, 0.5)
+size = Vector3(4, 5, 0.5)
 
 [node name="Gate" type="Node3D"]
 script = ExtResource("1_lv5wf")
-operation = null
-value = null
 
 [node name="Left" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.5, 0)

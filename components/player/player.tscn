@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://cbm8mrped3ppw"]
+[gd_scene load_steps=6 format=3 uid="uid://cbm8mrped3ppw"]
 
 [ext_resource type="Script" uid="uid://bxxajvgrnnmhr" path="res://components/player/player.gd" id="1_t3162"]
+[ext_resource type="PackedScene" uid="uid://qgm2mn130xfh" path="res://components/blobs/player_blob.tscn" id="2_kfe3d"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1v5o"]
 albedo_color = Color(0.4649247, 0.49995556, 1, 1)
@@ -13,6 +14,7 @@ size = Vector3(1, 2, 1)
 
 [node name="Player" type="Node3D"]
 script = ExtResource("1_t3162")
+unit_scene = ExtResource("2_kfe3d")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

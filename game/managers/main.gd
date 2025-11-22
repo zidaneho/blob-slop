@@ -8,6 +8,7 @@ enum GameState {
 
 @onready var start_screen : Control = $Canvas/StartScreen
 @onready var score_label : Label = $Canvas/ScoreContainer/HBoxContainer/ScoreLabel
+@onready var high_score_label : Label = $Canvas/ScoreContainer/HBoxContainer/HighScoreLabel
 @onready var game_over_screen = $Canvas/GameOverScreen
 @onready var player_scene = preload("res://components/player/player.tscn")
 @onready var unit_scene = preload("res://components/blobs/player_blob.tscn")
@@ -21,6 +22,9 @@ var is_game_active : bool = false
 var player_instance : Node3D
 
 func _ready() -> void:
+	GameManager.reset_score()
+	GameManager.score_updated.connect(_on_score_updated)
+	GameManager.high_score_updated.connect(_on_high_score_updated)
 	start_screen.visible = true
 	score_label.visible = false
 	game_over_screen.visible = false
@@ -56,3 +60,8 @@ func spawn_entities():
 	if player_instance != null:
 		add_child(player_instance)
 		player_instance.global_position = start_position
+func _on_score_updated(new_val):
+	score_label.text = "Score: " + str(new_val)
+
+func _on_high_score_updated(new_val):
+	high_score_label.text = "High Score: " + str(new_val)

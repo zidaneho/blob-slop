@@ -7,6 +7,8 @@ class_name Player extends Node3D
 @export var unit_scene: PackedScene
 @onready var collision_area = $Area3D/CollisionShape3D
 
+var is_movement_locked: bool = false
+
 # --- STATE ---
 var units: Array[Unit] = []
 var enemy_scan_timer: float = 0.0
@@ -16,7 +18,7 @@ var nearby_enemies: Array[Node3D] = []
 var is_game_active : bool = false
 
 func _physics_process(delta):
-	if not is_game_active:
+	if not is_game_active or is_movement_locked:
 		return
 	handle_movement(delta)
 	
