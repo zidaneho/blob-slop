@@ -14,8 +14,11 @@ enum GameState {
 @onready var player_scene = preload("res://components/player/player.tscn")
 @onready var unit_scene = preload("res://components/blobs/player_blob.tscn")
 @onready var map_gen = $MapGen
+@onready var opening_music = $Canvas/StartScreen/OpeningMusic
+@onready var spring_music = $SpringMusic
+@onready var spring_music_boss = $SpringMusicBoss
+@onready var game_over_music = $Canvas/GameOverScreen/GameOverMusic
 @export var start_position : Vector3 = Vector3(0,1,1)
-
 
 
 var game_state : GameState = GameState.INACTIVE
@@ -30,19 +33,25 @@ func _ready() -> void:
 	score_label.visible = false
 	game_over_screen.visible = false
 	stat_container.visible = false
-	
 	spawn_entities()
+	opening_music.play()
 
 func _process(_delta: float) -> void:
 	if game_state != GameState.ACTIVE:
 		return
 	
 	map_gen.update_chunk(player_instance)
+
 func start_game():
+	opening_music.stop()
+	spring_music.play()
 	if player_instance is Player:
 		(player_instance as Player).start_running()
 	
 func game_over():
+	spring_music.stop()
+	spring_music_boss.stop()
+	game_over_music.play()
 	game_state = GameState.GAME_OVER
 	game_over_screen.visible = true
 
