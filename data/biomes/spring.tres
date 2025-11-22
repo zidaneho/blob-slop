@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BiomeData" load_steps=6 format=3 uid="uid://cbwffm61r2i8y"]
+
+[ext_resource type="ArrayMesh" uid="uid://bl3n6qg8r28xv" path="res://assets/meshes/grass/grass_mesh.tres" id="1_8xwkn"]
+[ext_resource type="Material" uid="uid://dlg01nxh2ymke" path="res://assets/materials/grass/spring.tres" id="1_lxrac"]
+[ext_resource type="Script" uid="uid://ds88mx2ef2hbf" path="res://data/biomes/biome_data.gd" id="2_lxrac"]
+[ext_resource type="Texture2D" uid="uid://cwm5p6a14hcw1" path="res://assets/textures/sky_47_2k.png" id="3_1qgje"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1tl6c"]
+albedo_color = Color(0, 0, 0, 1)
+
+[resource]
+script = ExtResource("2_lxrac")
+ground_material = SubResource("StandardMaterial3D_1tl6c")
+grass_mesh = ExtResource("1_8xwkn")
+grass_material = ExtResource("1_lxrac")
+sky_texture = ExtResource("3_1qgje")
+fog_color = Color(0.74509805, 0.74509805, 0.74509805, 0.6745098)
+ambient_light_energy = 5.0
+metadata/_custom_type_script = "uid://ds88mx2ef2hbf"

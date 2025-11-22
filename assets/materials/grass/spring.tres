@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dlg01nxh2ymke"]
+
+[ext_resource type="Shader" uid="uid://8r0pl52vcb15" path="res://assets/materials/grass/grass.gdshader" id="1_w1075"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_w1075"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_w1075")
+shader_parameter/color_top = Color(0.41585213, 0.8336675, 0.20531803, 1)
+shader_parameter/color_bottom = Color(0, 0, 0, 1)
+shader_parameter/wind_speed = 1.0
+shader_parameter/wind_strength = 0.2
+shader_parameter/wind_noise = SubResource("NoiseTexture2D_w1075")
+shader_parameter/player_position = Vector3(0, 0, 0)
+shader_parameter/player_radius = 1.0

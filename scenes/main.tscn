@@ -1,0 +1,155 @@
+[gd_scene load_steps=10 format=3 uid="uid://dewpu7on3b3gh"]
+
+[ext_resource type="Script" uid="uid://d0mt71f4h0xtm" path="res://game/managers/main.gd" id="1_tefeu"]
+[ext_resource type="Texture2D" uid="uid://cwm5p6a14hcw1" path="res://assets/textures/sky_47_2k.png" id="2_o6xl0"]
+[ext_resource type="Script" uid="uid://c61sfvekl64t8" path="res://game/managers/ProceduralMapGenerator.gd" id="3_tipki"]
+[ext_resource type="PackedScene" uid="uid://ca0vfyuijnxif" path="res://components/chunks/Chunk.tscn" id="4_85g3d"]
+[ext_resource type="Script" uid="uid://ds88mx2ef2hbf" path="res://data/biomes/biome_data.gd" id="5_choun"]
+[ext_resource type="Resource" uid="uid://cbwffm61r2i8y" path="res://data/biomes/spring.tres" id="6_ya4ey"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_nqv1k"]
+panorama = ExtResource("2_o6xl0")
+
+[sub_resource type="Sky" id="Sky_nsuab"]
+sky_material = SubResource("PanoramaSkyMaterial_nqv1k")
+
+[sub_resource type="Environment" id="Environment_72qrf"]
+background_mode = 2
+sky = SubResource("Sky_nsuab")
+ambient_light_source = 3
+ambient_light_color = Color(0.9362647, 0.9362648, 0.9362647, 1)
+fog_mode = 1
+fog_light_color = Color(0.55857074, 0.596387, 0.6552126, 1)
+fog_light_energy = 0.0
+fog_density = 1.0
+fog_sky_affect = 0.4
+fog_height_density = 1.0
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_tefeu")
+camera_speed = 4.0
+
+[node name="Canvas" type="CanvasLayer" parent="."]
+
+[node name="StartScreen" type="ColorRect" parent="Canvas"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.24313726, 0.24313726, 0.24313726, 0.38039216)
+
+[node name="MarginContainer" type="MarginContainer" parent="Canvas/StartScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Canvas/StartScreen/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="Canvas/StartScreen/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Blob Slop"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="Canvas/StartScreen/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+
+[node name="Left" type="Label" parent="Canvas/StartScreen/MarginContainer/VBoxContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -276.0
+offset_top = -43.0
+offset_right = -236.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = ">"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="Canvas/StartScreen/MarginContainer/VBoxContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -101.5
+offset_top = -11.5
+offset_right = 101.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Press Left or Right to Start"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Right" type="Label" parent="Canvas/StartScreen/MarginContainer/VBoxContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 224.0
+offset_top = -44.0
+offset_right = 264.0
+offset_bottom = 44.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "<"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScoreContainer" type="MarginContainer" parent="Canvas"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 16.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_top = 30
+
+[node name="Label" type="Label" parent="Canvas/ScoreContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Score: "
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_72qrf")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-1, 0, -8.742278e-08, -1.6862245e-08, 0.98122203, 0.19288161, 8.578115e-08, 0.19288161, -0.98122203, 0, 3.65168, -0.3333373)
+
+[node name="MapGen" type="Node3D" parent="." node_paths=PackedStringArray("player", "world_env")]
+script = ExtResource("3_tipki")
+chunk_scene = ExtResource("4_85g3d")
+player = NodePath("../Camera3D")
+world_env = NodePath("../WorldEnvironment")
+biomes = Array[ExtResource("5_choun")]([ExtResource("6_ya4ey")])
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.61809283, 0.7861051, 0, -0.7861051, 0.61809283, 0, 0, 0)
+shadow_enabled = true
