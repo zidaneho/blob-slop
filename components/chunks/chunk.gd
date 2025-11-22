@@ -68,8 +68,11 @@ func _scatter_objects(node: MultiMeshInstance3D, rng: RandomNumberGenerator):
 	for i in range(count):
 		var t = Transform3D()
 		
+		var x_range = GameConfig.HALF_WIDTH 
+		var z_range = GameConfig.CHUNK_LENGTH
+		
 		# Random Position (Adjust -10/10 to fit your chunk size)
-		t.origin = Vector3(rng.randf_range(-5, 5), 0, rng.randf_range(-10, 10))
+		t.origin = Vector3(rng.randf_range(-x_range, x_range), 0, rng.randf_range(0, z_range))
 		
 		# Random Rotation (Y-axis)
 		t.basis = Basis(Vector3.UP, rng.randf_range(0, TAU))

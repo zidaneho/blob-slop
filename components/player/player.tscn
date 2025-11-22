@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://cbm8mrped3ppw"]
+
+[ext_resource type="Script" uid="uid://bxxajvgrnnmhr" path="res://components/player/player.gd" id="1_t3162"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1v5o"]
+albedo_color = Color(0.4649247, 0.49995556, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_t3162"]
+material = SubResource("StandardMaterial3D_f1v5o")
+size = Vector3(1, 2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_t3162"]
+
+[node name="Player" type="Node3D"]
+script = ExtResource("1_t3162")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_t3162")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="."]
+transform = Transform3D(-1, -4.371139e-08, 7.5710346e-08, 0, 0.8660254, 0.5, -8.742278e-08, 0.5, -0.8660254, 0, 2, 0)
+collision_mask = 0
+spring_length = 7.0
+margin = 0.5
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D"]
+
+[node name="Area3D" type="Area3D" parent="." groups=["players"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_t3162")

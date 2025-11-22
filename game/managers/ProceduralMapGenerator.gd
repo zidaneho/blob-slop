@@ -1,12 +1,10 @@
 extends Node3D
 
 @export var chunk_scene: PackedScene  # Drag Chunk.tscn here
-@export var player: Node3D            # Assign your player node
 @export var world_env: WorldEnvironment # Assign WorldEnvironment node
 @export var biomes: Array[BiomeData]  # Drag Forest.tres, Desert.tres here
 
 # Config
-var chunk_length = 10
 var pool_size = 5
 var active_chunks: Array[Node3D] = []
 
@@ -16,6 +14,7 @@ var chunks_spawned = 0
 var biome_switch_threshold = 50 # Switch every 50 chunks (1000m)
 
 func _ready():
+	var chunk_length = GameConfig.CHUNK_LENGTH
 	# Initialize the pool
 	for i in range(pool_size):
 		var chunk = chunk_scene.instantiate()
@@ -29,10 +28,10 @@ func _ready():
 	# Set initial environment
 	apply_environment_instant(biomes[current_biome_index])
 
-func _process(delta):
+func update_chunk(player : Node3D):
 	# Check if the chunk behind the player is too far back
 	var back_chunk = active_chunks[0]
-	if player.global_position.z > back_chunk.global_position.z + (chunk_length):
+	if player.global_position.z > back_chunk.global_position.z + (GameConfig.CHUNK_LENGTH * 2):
 		recycle_chunk()
 
 func recycle_chunk():
@@ -40,7 +39,7 @@ func recycle_chunk():
 	var front_chunk = active_chunks.back()
 	
 	# Move chunk to the front
-	chunk.position.z = front_chunk.position.z + chunk_length
+	chunk.position.z = front_chunk.position.z + GameConfig.CHUNK_LENGTH
 	
 	chunk.position.y = -10.0 
 	

@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://qgm2mn130xfh"]
+
+[ext_resource type="Script" uid="uid://cee33v7jivuhk" path="res://components/blobs/Unit.gd" id="1_1emtq"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_jcb2t"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dkkcj"]
+albedo_color = Color(0.56940794, 1, 1, 1)
+
+[node name="Blob" type="Node3D"]
+script = ExtResource("1_1emtq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_jcb2t")
+surface_material_override/0 = SubResource("StandardMaterial3D_dkkcj")

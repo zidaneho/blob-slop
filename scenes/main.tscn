@@ -27,7 +27,7 @@ fog_height_density = 1.0
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_tefeu")
-camera_speed = 4.0
+start_position = Vector3(0, 0, 5)
 
 [node name="Canvas" type="CanvasLayer" parent="."]
 
@@ -120,7 +120,105 @@ text = "<"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="GameOverScreen" type="ColorRect" parent="Canvas"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.24313726, 0.24313726, 0.24313726, 0.38039216)
+
+[node name="MarginContainer" type="MarginContainer" parent="Canvas/GameOverScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Canvas/GameOverScreen/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "You Lose!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Score" type="Label" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Final Score: 2567834535345"
+horizontal_alignment = 1
+
+[node name="Control" type="Control" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+
+[node name="Left" type="Label" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -326.0
+offset_top = -43.0
+offset_right = -286.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = ">"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -101.5
+offset_top = -11.5
+offset_right = 101.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Press Left or Right to Try Again"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Right" type="Label" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 274.0
+offset_top = -44.0
+offset_right = 314.0
+offset_bottom = 44.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 64
+text = "<"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="ScoreContainer" type="MarginContainer" parent="Canvas"]
+visible = false
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 16.0
@@ -129,24 +227,33 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_constants/margin_top = 30
 
-[node name="Label" type="Label" parent="Canvas/ScoreContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Canvas/ScoreContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="Canvas/ScoreContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
-text = "Score: "
+text = "Score: 252523"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HighScoreLabel" type="Label" parent="Canvas/ScoreContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "High Score: 235235"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_72qrf")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-1, 0, -8.742278e-08, -1.6862245e-08, 0.98122203, 0.19288161, 8.578115e-08, 0.19288161, -0.98122203, 0, 3.65168, -0.3333373)
-
-[node name="MapGen" type="Node3D" parent="." node_paths=PackedStringArray("player", "world_env")]
+[node name="MapGen" type="Node3D" parent="." node_paths=PackedStringArray("world_env")]
 script = ExtResource("3_tipki")
 chunk_scene = ExtResource("4_85g3d")
-player = NodePath("../Camera3D")
 world_env = NodePath("../WorldEnvironment")
 biomes = Array[ExtResource("5_choun")]([ExtResource("6_ya4ey")])
 
