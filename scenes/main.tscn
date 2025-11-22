@@ -1,15 +1,18 @@
-[gd_scene load_steps=14 format=3 uid="uid://dewpu7on3b3gh"]
+[gd_scene load_steps=17 format=3 uid="uid://dewpu7on3b3gh"]
 
 [ext_resource type="Script" uid="uid://d0mt71f4h0xtm" path="res://game/managers/main.gd" id="1_tefeu"]
+[ext_resource type="Script" uid="uid://4b7gd5qo0y8x" path="res://components/ui/stat_container.gd" id="2_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://cwm5p6a14hcw1" path="res://assets/textures/sky_47_2k.png" id="2_o6xl0"]
 [ext_resource type="Script" uid="uid://c61sfvekl64t8" path="res://game/managers/ProceduralMapGenerator.gd" id="3_tipki"]
 [ext_resource type="PackedScene" uid="uid://ca0vfyuijnxif" path="res://components/chunks/Chunk.tscn" id="4_85g3d"]
 [ext_resource type="Script" uid="uid://ds88mx2ef2hbf" path="res://data/biomes/biome_data.gd" id="5_choun"]
 [ext_resource type="Resource" uid="uid://cbwffm61r2i8y" path="res://data/biomes/spring.tres" id="6_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://wuda3f5r87a3" path="res://components/chunks/Gate1Chunk.tscn" id="7_tipki"]
+[ext_resource type="Resource" uid="uid://dcxhdqe5vjcak" path="res://data/biomes/winter.tres" id="7_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://dv7ysojvneigg" path="res://components/chunks/BossChunk.tscn" id="8_85g3d"]
 [ext_resource type="PackedScene" uid="uid://dilek3jtotwx3" path="res://components/chunks/Gate2Chunk.tscn" id="8_choun"]
 [ext_resource type="PackedScene" uid="uid://boqb6artg12de" path="res://components/chunks/Gate3Chunk.tscn" id="9_ya4ey"]
+[ext_resource type="PackedScene" uid="uid://cmhvvriqhsqd1" path="res://components/blobs/enemy_blob.tscn" id="13_trceg"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_nqv1k"]
 panorama = ExtResource("2_o6xl0")
@@ -252,6 +255,28 @@ text = "High Score: 235235"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="StatContainer" type="MarginContainer" parent="Canvas"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+script = ExtResource("2_eb6dy")
+
+[node name="UnitLabel" type="Label" parent="Canvas/StatContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Units: 2352353243"
+horizontal_alignment = 2
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_72qrf")
 
@@ -259,9 +284,10 @@ environment = SubResource("Environment_72qrf")
 script = ExtResource("3_tipki")
 chunk_scene = ExtResource("4_85g3d")
 world_env = NodePath("../WorldEnvironment")
-biomes = Array[ExtResource("5_choun")]([ExtResource("6_ya4ey")])
+biomes = Array[ExtResource("5_choun")]([ExtResource("6_ya4ey"), ExtResource("7_ya4ey")])
 gate_chunk_scene = Array[PackedScene]([ExtResource("7_tipki"), ExtResource("8_choun"), ExtResource("9_ya4ey")])
 boss_chunk_scene = ExtResource("8_85g3d")
+enemy_scene = ExtResource("13_trceg")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.61809283, 0.7861051, 0, -0.7861051, 0.61809283, 0, 0, 0)

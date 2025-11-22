@@ -8,12 +8,15 @@ class_name Unit extends Node3D
 var target_position: Vector3 = Vector3.ZERO
 var target_enemy: Node3D = null
 var can_shoot: bool = true
+var attack_damage : float = 0
+
 
 # --- COMPONENTS ---
 @onready var model = $MeshInstance3D # Assuming you have a mesh child
 # @onready var gun_tip = $GunTip # Optional: spawn point for bullets
 
 func _ready():
+	add_to_group("units")
 	# Detach from parent visually to allow smooth movement in world space
 	set_as_top_level(true)
 	# Start at the player's position to avoid "flying in" from (0,0,0)
@@ -52,13 +55,18 @@ func assign_target(enemy: Node3D):
 
 func trigger_attack():
 	if not can_shoot: return
+	if not is_instance_valid(target_enemy): return
 	
-	# VISUAL ONLY: Play animation, squash/stretch, or spawn particle
+	# 1. Visuals
 	_play_shoot_visuals()
 	
-	# Reset Cooldown
+	# 2. DEAL DAMAGE (The missing link)
+	if target_enemy.has_method("take_damage"):
+		target_enemy.take_damage(attack_damage)
+	
+	# 3. Cooldown Logic
 	can_shoot = false
-	await get_tree().create_timer(attack_cooldown).timeout
+	await get_tree().create_timer(0.5).timeout # Attack speed
 	can_shoot = true
 
 func _play_shoot_visuals():

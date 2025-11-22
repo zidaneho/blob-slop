@@ -1,6 +1,5 @@
 extends Chunk # Inherit from your base Chunk script
 
-@export var gates : Array[Gate]  # Make sure your child node is named "Gate"
 var is_gate_locked: bool = false # The Master Switch
 func _ready() -> void:
 	var gates = find_children("*", "Gate")

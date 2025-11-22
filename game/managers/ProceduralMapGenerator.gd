@@ -5,15 +5,15 @@ extends Node3D
 @export var biomes: Array[BiomeData]  # Drag Forest.tres, Desert.tres here
 @export var gate_chunk_scene : Array[PackedScene]
 @export var boss_chunk_scene: PackedScene
+@export var enemy_scene : PackedScene
 
-enum ChunkType { NORMAL, GATE, BOSS }
+enum ChunkType { NORMAL, GATE, ENEMY,  BOSS }
 
 # Defines the pattern: 10 Normals -> 1 Gate -> 10 Normals -> 1 Boss
 var spawn_pattern = [
-	ChunkType.GATE, ChunkType.NORMAL, ChunkType.NORMAL, 
-	ChunkType.GATE, ChunkType.NORMAL, ChunkType.GATE, 
-	ChunkType.NORMAL, ChunkType.NORMAL, ChunkType.GATE, 
-	ChunkType.BOSS
+	ChunkType.GATE, ChunkType.NORMAL, ChunkType.ENEMY, 
+	ChunkType.GATE, ChunkType.ENEMY, ChunkType.GATE, 
+	ChunkType.ENEMY, ChunkType.NORMAL, ChunkType.BOSS
 ]
 var pattern_index = 0
 
@@ -70,30 +70,35 @@ func recycle_chunk():
 	var current_type = spawn_pattern[pattern_index]
 	pattern_index = (pattern_index + 1) % spawn_pattern.size()
 	
-	# 2. MANAGE POOLING
-	# If we need a special chunk, we MUST delete the old one and create new.
-	# If we need a Normal chunk, we try to reuse the old one to save performance.
-	
+	# 2. MANAGE POOLING (Create New or Reuse)
 	if current_type != ChunkType.NORMAL:
-		# Case A: Special Chunk (Boss/Gate) -> Create New
+		# Case A: Special Chunk (Boss/Gate/Enemy) -> Create New
 		chunk.queue_free() 
 		chunk = spawn_chunk_of_type(current_type)
 		add_child(chunk)
 		
 	else:
 		# Case B: Normal Chunk needed
-		if chunk.has_node("Gate") or chunk.has_node("BossUnit"):
-			# If the old chunk was special, destroy it and make a normal one
+		# If the old chunk was a special one, we must destroy it and make a normal one
+		if chunk.has_node("Gate") or chunk.has_node("BossUnit") or chunk.has_node("KillArea"):
 			chunk.queue_free()
 			chunk = spawn_chunk_of_type(ChunkType.NORMAL)
 			add_child(chunk)
 		else:
-			# Case C: Old chunk was Normal, New chunk is Normal -> REUSE IT (Fastest)
+			# Case C: Old chunk was Normal -> Reuse it (No code needed)
 			pass 
 
 	# 3. POSITION IT
 	chunk.position.z = front_chunk.position.z + GameConfig.CHUNK_LENGTH
 	
+	# 4. APPLY POP-UP ANIMATION (Applies to ALL types)
+	chunk.position.y = -10.0 # Start underground
+	
+	var tween = create_tween()
+	# Pop up to y=0.0 over 0.5 seconds
+	tween.tween_property(chunk, "position:y", 0.0, 0.5).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	
+	# 5. CONFIGURE BIOME
 	if chunk.has_method("configure"):
 		chunk.configure(biomes[current_biome_index])
 		
@@ -162,16 +167,31 @@ func spawn_chunk_of_type(type: ChunkType) -> Node3D:
 			new_chunk = boss_chunk_scene.instantiate()
 			
 		ChunkType.GATE:
-			# Pick random gate scene
+			# ... (existing gate logic) ...
 			var random_scene = gate_chunk_scene.pick_random()
 			new_chunk = random_scene.instantiate()
-			
-			# Configure gates immediately
 			var gates = new_chunk.find_children("*", "Gate", true, false)
 			for gate in gates:
 				randomize_gate(gate)
-				
+
+		ChunkType.ENEMY:
+			# Reuse normal chunk base
+			new_chunk = chunk_scene.instantiate()
+			spawn_enemies_in_chunk(new_chunk)
+			
 		ChunkType.NORMAL:
 			new_chunk = chunk_scene.instantiate()
-			
 	return new_chunk
+func spawn_enemies_in_chunk(chunk: Node3D):
+	# Spawn 3-5 enemies randomly on the road
+	var count = randi_range(3, 5)
+	
+	for i in range(count):
+		var enemy = enemy_scene.instantiate()
+		chunk.add_child(enemy)
+		
+		# Random Position on the road (using GameConfig constants)
+		var x_pos = randf_range(-GameConfig.HALF_WIDTH, GameConfig.HALF_WIDTH)
+		var z_pos = randf_range(2.0, GameConfig.CHUNK_LENGTH - 2.0)
+		
+		enemy.position = Vector3(x_pos, 0, z_pos)

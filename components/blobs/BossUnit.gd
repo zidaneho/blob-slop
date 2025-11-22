@@ -16,5 +16,5 @@ func take_damage(amount):
 		die()
 
 func die():
-	emit_signal("died")
+	died.emit()
 	queue_free()

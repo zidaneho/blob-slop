@@ -1,9 +1,13 @@
 class_name Player extends Node3D
 
+signal updated_unit_count(new_count : int)
+signal player_died
+
 # --- CONFIGURATION ---
 @export var movement_speed: float = 5
 @export var formation_radius: float = 3.0
 @export var attack_range: float = 15.0
+@export var damage_per_unit : float = 1
 @export var unit_scene: PackedScene
 @onready var collision_area = $Area3D/CollisionShape3D
 
@@ -17,6 +21,9 @@ var enemy_scan_timer: float = 0.0
 var nearby_enemies: Array[Node3D] = []
 var is_game_active : bool = false
 
+func _ready() -> void:
+	add_to_group("units")
+
 func _physics_process(delta):
 	if not is_game_active or is_movement_locked:
 		return
@@ -29,7 +36,6 @@ func _physics_process(delta):
 		enemy_scan_timer = 0.0
 	
 	update_unit_commands()
-	update_swarm_bounds()
 
 # --- MOVEMENT ---
 
@@ -150,9 +156,11 @@ func handle_operation(operation: GameConfig.Operation, value: int):
 				target_count = current_count / value
 			else:
 				target_count = 1 # Fallback logic
-	
+		
 	# Ensure we don't go below zero (or 1 if you prefer game over on 0)
 	target_count = max(0, target_count)
+	
+	updated_unit_count.emit(target_count)
 	
 	# --- ADJUST SWARM SIZE ---
 	var diff = target_count - current_count
@@ -161,26 +169,7 @@ func handle_operation(operation: GameConfig.Operation, value: int):
 		spawn_units(diff)
 	elif diff < 0:
 		remove_units(abs(diff))
-func update_swarm_bounds():
-	if units.is_empty():
-		return
 
-	# 1. Start a box at the Player's position
-	# We use AABB (Axis Aligned Bounding Box) class
-	var bounds = AABB(global_position, Vector3.ZERO)
-	# 2. Expand the box to include every unit
-	for unit in units:
-		bounds = bounds.expand(unit.global_position)
-
-	# 3. Apply to Collision Shape
-	# 'bounds.size' is the Width/Height/Depth
-	# 'bounds.get_center()' is the middle point
-
-	# Add a little padding (e.g. 1.0) so units aren't exactly on the edge
-	collision_area.shape.size = bounds.size + Vector3(1, 1, 1)
-
-	# Move the shape to the center of the swarm
-	collision_area.global_position = bounds.get_center()
 
 func spawn_units(amount: int):
 	# Safety check
@@ -194,7 +183,7 @@ func spawn_units(amount: int):
 		# Add to the same parent as the player (The Main Scene)
 		# This keeps them independent in the scene tree
 		get_parent().add_child(new_unit)
-		
+		new_unit.attack_damage = damage_per_unit
 		# Start them at the player's position (with slight random offset)
 		new_unit.global_position = global_position + Vector3(
 			randf_range(-1, 1), 0, randf_range(-1, 1)
@@ -213,3 +202,17 @@ func remove_units(amount: int):
 		
 		if is_instance_valid(unit_to_remove):
 			unit_to_remove.queue_free()
+func die():
+	# Prevent multiple triggers
+	if not is_game_active: return
+	
+	is_game_active = false
+	
+	# 1. Visuals: Maybe play a death animation or particles
+	visible = false 
+	
+	# 2. Notify the system
+	emit_signal("player_died")
+	
+	# 3. Optional: Stop the game speed
+	# Engine.time_scale = 0.1 # Slow motion death effect?
