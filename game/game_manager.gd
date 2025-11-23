@@ -4,6 +4,8 @@ extends Node
 # UI will listen to these to update the text labels
 signal score_updated(new_score: int)
 signal high_score_updated(new_high_score: int)
+signal started_boss_fight
+signal ended_boss_fight
 
 # --- CONFIGURATION ---
 const SAVE_PATH = "user://blob_slop_save.data"

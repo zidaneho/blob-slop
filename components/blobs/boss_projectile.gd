@@ -1,7 +1,7 @@
 extends Area3D
 
 @export var speed: float = 15.0
-@export var damage: float = 1.0
+@export var damage: int = 3
 @export var lifetime: float = 5.0
 
 var direction: Vector3 = Vector3.FORWARD
@@ -27,11 +27,9 @@ func _on_hit(other):
 	# Check for Units or Player
 	# Note: We check the parent because usually the Area3D is a child of the Unit
 	var target = other
-	if not target.has_method("take_damage"):
-		target = other.get_parent()
-		
-	if target.has_method("take_damage"):
-		target.take_damage(damage)
+	
+	if target.get_parent() != null and target.get_parent() is Player:
+		target.get_parent().take_damage(damage)
 		queue_free() # Destroy projectile on impact
 	elif other is StaticBody3D: 
 		queue_free() # Destroy on wall hit

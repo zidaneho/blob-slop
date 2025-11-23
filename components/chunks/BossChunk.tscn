@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dv7ysojvneigg"]
+[gd_scene load_steps=16 format=3 uid="uid://dv7ysojvneigg"]
 
 [ext_resource type="Script" uid="uid://cbpafmex4rt7j" path="res://components/chunks/boss_chunk.gd" id="1_moqfe"]
 [ext_resource type="ArrayMesh" uid="uid://bl3n6qg8r28xv" path="res://assets/meshes/grass/grass_mesh.tres" id="2_ax3hi"]
@@ -41,6 +41,10 @@ albedo_texture = ExtResource("4_cd22u")
 billboard_mode = 1
 billboard_keep_scale = true
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cd22u"]
+radius = 1.0
+height = 8.0
+
 [node name="BossChunk" type="Node3D"]
 script = ExtResource("1_moqfe")
 
@@ -69,7 +73,7 @@ multimesh = SubResource("MultiMesh_n3w3y")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1715393, 2.506775, 8.003906)
 shape = SubResource("BoxShape3D_moqfe")
 
-[node name="BossUnit" type="Node3D" parent="."]
+[node name="BossUnit" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 7.5)
 script = ExtResource("3_owh25")
 projectile_scene = ExtResource("4_54r16")
@@ -78,3 +82,7 @@ projectile_scene = ExtResource("4_54r16")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("QuadMesh_54r16")
 surface_material_override/0 = SubResource("StandardMaterial3D_l03ju")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BossUnit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("CapsuleShape3D_cd22u")

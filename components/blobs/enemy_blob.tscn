@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://cmhvvriqhsqd1"]
+[gd_scene load_steps=7 format=3 uid="uid://cmhvvriqhsqd1"]
 
 [ext_resource type="Script" uid="uid://d3fsllk3i8gc7" path="res://components/blobs/EnemyUnit.gd" id="1_dceoi"]
 [ext_resource type="Texture2D" uid="uid://di6swolh8c3yy" path="res://assets/blobs/Enemy_Blob.png" id="2_qi2l0"]
@@ -15,6 +15,7 @@ billboard_mode = 1
 size = Vector3(0.8, 2, 0.8)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_dceoi"]
+radius = 1.0
 
 [node name="Blob" type="CharacterBody3D"]
 script = ExtResource("1_dceoi")
@@ -31,5 +32,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.5)
 shape = SubResource("BoxShape3D_dceoi")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1.3891696, 0, 0, 0, 2.1699083, 0, 0, 0, 1.2812842, -0.022739053, 0.9653045, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.022739053, 0.9653045, 0)
 shape = SubResource("SphereShape3D_dceoi")

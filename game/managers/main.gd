@@ -29,6 +29,8 @@ func _ready() -> void:
 	GameManager.reset_score()
 	GameManager.score_updated.connect(_on_score_updated)
 	GameManager.high_score_updated.connect(_on_high_score_updated)
+	GameManager.started_boss_fight.connect(_on_boss_started)
+	GameManager.ended_boss_fight.connect(_on_boss_ended)
 	start_screen.visible = true
 	score_label.visible = false
 	high_score_label.visible = false
@@ -99,4 +101,9 @@ func _on_game_over():
 	if has_node("MapGen"):
 		$MapGen.set_process(false)
 		
-	
+func _on_boss_started():
+	spring_music.stop()
+	spring_music_boss.play()
+func _on_boss_ended():
+	spring_music_boss.stop()
+	spring_music.play()

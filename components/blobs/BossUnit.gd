@@ -6,7 +6,7 @@ signal died
 @export var boss_damage = 5.0 # High damage for the boss
 @export var attack_range = 25.0
 @export var max_health = 100
-@export var attack_cooldown = 1
+@export var attack_cooldown = 0.5
 var current_health = 100
 
 func _ready():
@@ -87,6 +87,7 @@ func trigger_attack():
 func start_fight():
 	# Play roar animation, show UI
 	print("starting fight")
+	GameManager.started_boss_fight.emit()
 	
 	# Optional: If the boss needs to move AROUND the arena, 
 	# you can enable movement here:
@@ -101,4 +102,5 @@ func take_damage(amount):
 
 func die():
 	died.emit()
+	GameManager.ended_boss_fight.emit()
 	queue_free()

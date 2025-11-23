@@ -192,7 +192,29 @@ func spawn_units(amount: int):
 		
 		# Register them to the swarm
 		register_unit(new_unit)
+func take_damage(amount: int):
+	# Safety check: Don't take damage if the game is already over
+	if not is_game_active:
+		return
 
+	# Case 1: The Player has a swarm (Units act as Health/Armor)
+	if units.size() > 0:
+		# If the damage is greater than or equal to remaining units, 
+		# the player loses everything and dies.
+		if amount >= units.size():
+			remove_units(units.size()) # Clear the array visually/logically
+			updated_unit_count.emit(0)
+			die()
+		else:
+			# The swarm absorbs the damage
+			remove_units(amount)
+			updated_unit_count.emit(units.size())
+			
+			# Optional: Add a "hit" effect here (e.g., screen shake or flash)
+			
+	# Case 2: The Player has no units left (Direct hit)
+	else:
+		die()
 func remove_units(amount: int):
 	# Don't try to remove more than we have
 	amount = min(amount, units.size())
