@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://dewpu7on3b3gh"]
+[gd_scene load_steps=24 format=3 uid="uid://dewpu7on3b3gh"]
 
 [ext_resource type="Script" uid="uid://d0mt71f4h0xtm" path="res://game/managers/main.gd" id="1_tefeu"]
 [ext_resource type="AudioStream" uid="uid://bj652uh4ufya6" path="res://music/game_over.wav" id="2_a8y0u"]
@@ -14,6 +14,9 @@
 [ext_resource type="PackedScene" uid="uid://dv7ysojvneigg" path="res://components/chunks/BossChunk.tscn" id="8_85g3d"]
 [ext_resource type="PackedScene" uid="uid://dilek3jtotwx3" path="res://components/chunks/Gate2Chunk.tscn" id="8_choun"]
 [ext_resource type="PackedScene" uid="uid://boqb6artg12de" path="res://components/chunks/Gate3Chunk.tscn" id="9_ya4ey"]
+[ext_resource type="Resource" uid="uid://oixgnd3oobdu" path="res://data/biomes/cherry_blossoms.tres" id="10_gqmmt"]
+[ext_resource type="Resource" uid="uid://c2vav54q576m7" path="res://data/biomes/summer.tres" id="11_yc10j"]
+[ext_resource type="Resource" uid="uid://b3bqtf0gl7itp" path="res://data/biomes/fall.tres" id="12_jscy8"]
 [ext_resource type="PackedScene" uid="uid://cmhvvriqhsqd1" path="res://components/blobs/enemy_blob.tscn" id="13_trceg"]
 [ext_resource type="AudioStream" uid="uid://xrmg8vhega2g" path="res://music/spring_level.wav" id="16_jbj1t"]
 [ext_resource type="AudioStream" uid="uid://cuisqu13cj16l" path="res://music/spring_level_boss.wav" id="17_muem4"]
@@ -292,7 +295,7 @@ environment = SubResource("Environment_72qrf")
 script = ExtResource("3_tipki")
 chunk_scene = ExtResource("4_85g3d")
 world_env = NodePath("../WorldEnvironment")
-biomes = Array[ExtResource("5_choun")]([ExtResource("6_ya4ey"), ExtResource("7_ya4ey")])
+biomes = Array[ExtResource("5_choun")]([ExtResource("6_ya4ey"), ExtResource("10_gqmmt"), ExtResource("11_yc10j"), ExtResource("12_jscy8"), ExtResource("7_ya4ey")])
 gate_chunk_scene = Array[PackedScene]([ExtResource("7_tipki"), ExtResource("8_choun"), ExtResource("9_ya4ey")])
 boss_chunk_scene = ExtResource("8_85g3d")
 enemy_scene = ExtResource("13_trceg")

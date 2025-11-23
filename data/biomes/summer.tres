@@ -1,17 +1,17 @@
-[gd_resource type="Resource" script_class="BiomeData" load_steps=8 format=3 uid="uid://cbwffm61r2i8y"]
+[gd_resource type="Resource" script_class="BiomeData" load_steps=8 format=3 uid="uid://c2vav54q576m7"]
 
+[ext_resource type="Shader" uid="uid://8r0pl52vcb15" path="res://assets/materials/grass/grass.gdshader" id="1_6mdsk"]
 [ext_resource type="ArrayMesh" uid="uid://bl3n6qg8r28xv" path="res://assets/meshes/grass/grass_mesh.tres" id="1_8xwkn"]
-[ext_resource type="Shader" uid="uid://8r0pl52vcb15" path="res://assets/materials/grass/grass.gdshader" id="1_lxrac"]
 [ext_resource type="Script" uid="uid://ds88mx2ef2hbf" path="res://data/biomes/biome_data.gd" id="2_lxrac"]
 [ext_resource type="Texture2D" uid="uid://cwm5p6a14hcw1" path="res://assets/textures/sky_47_2k.png" id="3_1qgje"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_w1075"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_lxrac"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6mdsk"]
 render_priority = 0
-shader = ExtResource("1_lxrac")
-shader_parameter/color_top = Color(0.4809823, 0.8255523, 0, 1)
-shader_parameter/color_bottom = Color(0, 0, 0, 1)
+shader = ExtResource("1_6mdsk")
+shader_parameter/color_top = Color(0.98564774, 0.84063435, 0.120257415, 1)
+shader_parameter/color_bottom = Color(0.12591085, 0.12591085, 0.12591082, 1)
 shader_parameter/wind_speed = 1.0
 shader_parameter/wind_strength = 0.2
 shader_parameter/wind_noise = SubResource("NoiseTexture2D_w1075")
@@ -25,7 +25,7 @@ albedo_color = Color(0, 0, 0, 1)
 script = ExtResource("2_lxrac")
 ground_material = SubResource("StandardMaterial3D_1tl6c")
 grass_mesh = ExtResource("1_8xwkn")
-grass_material = SubResource("ShaderMaterial_lxrac")
+grass_material = SubResource("ShaderMaterial_6mdsk")
 sky_texture = ExtResource("3_1qgje")
 fog_color = Color(0.74509805, 0.74509805, 0.74509805, 0.6745098)
 ambient_light_energy = 5.0
