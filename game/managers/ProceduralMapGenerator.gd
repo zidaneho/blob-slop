@@ -18,7 +18,7 @@ var spawn_pattern = [
 	ChunkType.ENEMY, ChunkType.NORMAL, ChunkType.BOSS
 ]
 var pattern_index = 0
-
+var difficulty_tier: int = 0
 # Config
 var pool_size = 5
 var active_chunks: Array[Node3D] = []
@@ -29,7 +29,7 @@ var transition_z: float = INF # The Z-coordinate where the new biome begins
 var pending_biome: BiomeData = null # The biome waiting to be revealed
 #var chunks_spawned = 0
 #var biome_switch_threshold = 50 # Switch every 50 chunks (1000m)
-
+var first_gate_spawned: bool = false
 func _ready():
 	var chunk_length = GameConfig.CHUNK_LENGTH
 	
@@ -155,6 +155,10 @@ func randomize_gate(gate: Gate):
 			val = randi_range(2, 4) # Small numbers for multiply to prevent infinite growth
 		GameConfig.Operation.DIVIDE: 
 			val = randi_range(2, 3) # Divide by 2 or 3 only
+		GameConfig.Operation.LOG:
+			# We only want base 2 or base 10 usually, as they make the most sense mentally
+			var bases = [2, 10]
+			val = bases.pick_random()
 			
 	# 3. Apply to the Gate
 	gate.setup(operation, val)
@@ -164,14 +168,22 @@ func spawn_chunk_of_type(type: ChunkType) -> Node3D:
 	match type:
 		ChunkType.BOSS:
 			new_chunk = boss_chunk_scene.instantiate()
-			print("boss chunked spawn")
+			if new_chunk.has_method("setup_boss_stats"):
+				new_chunk.setup_boss_stats(difficulty_tier)
 		ChunkType.GATE:
 			# ... (existing gate logic) ...
 			var random_scene = gate_chunk_scene.pick_random()
 			new_chunk = random_scene.instantiate()
 			var gates = new_chunk.find_children("*", "Gate", true, false)
 			for gate in gates:
-				randomize_gate(gate)
+				if not first_gate_spawned:
+					# Force Guaranteed Addition for the tutorial phase
+					gate.setup(GameConfig.Operation.ADD, randi_range(5, 10))
+				else:
+					# Standard Randomization
+					randomize_gate(gate)
+			if not first_gate_spawned:
+				first_gate_spawned = true
 
 		ChunkType.ENEMY:
 			# Reuse normal chunk base
@@ -196,6 +208,7 @@ func spawn_enemies_in_chunk(chunk: Node3D):
 		enemy.position = Vector3(x_pos, 0, z_pos)
 func on_boss_defeated():
 	# 1. SWITCH DATA IMMEDIATELY
+	difficulty_tier += 1
 	current_biome_index = (current_biome_index + 1) % biomes.size()
 	var new_biome = biomes[current_biome_index]
 	

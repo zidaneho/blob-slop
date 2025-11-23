@@ -11,6 +11,7 @@ enum GameState {
 @onready var stat_container = $Canvas/StatContainer
 @onready var high_score_label : Label = $Canvas/ScoreContainer/HBoxContainer/HighScoreLabel
 @onready var game_over_screen = $Canvas/GameOverScreen
+@onready var game_over_score = $Canvas/GameOverScreen/MarginContainer/VBoxContainer/Score
 @onready var player_scene = preload("res://components/player/player.tscn")
 @onready var unit_scene = preload("res://components/blobs/player_blob.tscn")
 @onready var map_gen = $MapGen
@@ -19,7 +20,7 @@ enum GameState {
 @onready var spring_music_boss = $SpringMusicBoss
 @onready var game_over_music = $Canvas/GameOverScreen/GameOverMusic
 @export var start_position : Vector3 = Vector3(0,1,1)
-
+@onready var boss_health_bar = $Canvas/MarginContainer/BossHealthBar
 
 var game_state : GameState = GameState.INACTIVE
 var is_game_active : bool = false
@@ -31,6 +32,10 @@ func _ready() -> void:
 	GameManager.high_score_updated.connect(_on_high_score_updated)
 	GameManager.started_boss_fight.connect(_on_boss_started)
 	GameManager.ended_boss_fight.connect(_on_boss_ended)
+	GameManager.boss_health_updated.connect(_on_boss_health_updated)
+	GameManager.load_high_score()
+	if boss_health_bar:
+		boss_health_bar.visible = false
 	start_screen.visible = true
 	score_label.visible = false
 	high_score_label.visible = false
@@ -86,6 +91,7 @@ func spawn_entities():
 		player_instance.player_died.connect(_on_game_over)
 func _on_score_updated(new_val):
 	score_label.text = "Score: " + str(new_val)
+	game_over_score.text = "Final Score: " + str(new_val)
 
 func _on_high_score_updated(new_val):
 	high_score_label.text = "High Score: " + str(new_val)
@@ -104,6 +110,14 @@ func _on_game_over():
 func _on_boss_started():
 	spring_music.stop()
 	spring_music_boss.play()
+	if boss_health_bar:
+		boss_health_bar.visible = true
 func _on_boss_ended():
 	spring_music_boss.stop()
 	spring_music.play()
+	if boss_health_bar:
+		boss_health_bar.visible = false
+func _on_boss_health_updated(current_hp,max_hp):
+	if boss_health_bar:
+		boss_health_bar.max_value = max_hp
+		boss_health_bar.value = current_hp

@@ -172,7 +172,7 @@ vertical_alignment = 1
 [node name="Score" type="Label" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Final Score: 2567834535345"
+text = "Final Score: 0"
 horizontal_alignment = 1
 
 [node name="Control" type="Control" parent="Canvas/GameOverScreen/MarginContainer/VBoxContainer"]
@@ -254,7 +254,7 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
-text = "Score: 252523"
+text = "Score: 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -262,7 +262,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32
-text = "High Score: 235235"
+text = "High Score: 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -287,6 +287,27 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Units: 2352353243"
 horizontal_alignment = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Canvas"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = 93.0
+offset_right = 250.0
+offset_bottom = 143.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BossHealthBar" type="ProgressBar" parent="Canvas/MarginContainer"]
+custom_minimum_size = Vector2(500, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+value = 11.0
+rounded = true
+show_percentage = false
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_72qrf")

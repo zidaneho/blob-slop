@@ -33,3 +33,21 @@ func _on_boss_defeated():
 	# Optional: Despawn the wall so player can physically walk past
 	$ArenaTrigger.set_deferred("monitoring", false)
 	emit_signal("level_complete")
+func setup_boss_stats(difficulty_tier: int):
+	# Wait for children to be ready if called immediately after instantiation
+	if not boss_unit: 
+		await ready
+	
+	if boss_unit:
+		# Example Scaling:
+		# HP: +50% per biome (100 -> 150 -> 200...)
+		# DMG: +20% per biome (5 -> 6 -> 7...)
+		
+		var health_mult = 1.0 + (difficulty_tier * 0.5)
+		var damage_mult = 1.0 + (difficulty_tier * 0.2)
+		
+		boss_unit.max_health = round(boss_unit.max_health * health_mult)
+		boss_unit.current_health = boss_unit.max_health # IMPORTANT: Reset current HP
+		boss_unit.boss_damage = boss_unit.boss_damage * damage_mult
+		
+		print("Boss Spawned! Tier: ", difficulty_tier, " | HP: ", boss_unit.max_health)

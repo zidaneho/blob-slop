@@ -15,5 +15,6 @@ enum Operation {
 	ADD,
 	MULTIPLY,
 	SUBTRACT,
-	DIVIDE
+	DIVIDE,
+	LOG,
 }

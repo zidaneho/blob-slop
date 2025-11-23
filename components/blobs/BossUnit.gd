@@ -10,6 +10,7 @@ signal died
 var current_health = 100
 
 func _ready():
+	current_health = max_health
 	# 1. STAY ATTACHED
 	# We want the boss to ride the chunk to its spawn position.
 	set_as_top_level(false)
@@ -32,7 +33,7 @@ func _process(delta):
 		if dist_sq < attack_range * attack_range:
 			trigger_attack()
 func find_priority_target() -> Node3D:
-	var all_units = get_tree().get_nodes_in_group("units")
+	var all_units = get_tree().get_nodes_in_group("players")
 	var minions = []
 	var player_node = null
 	
@@ -88,6 +89,7 @@ func start_fight():
 	# Play roar animation, show UI
 	print("starting fight")
 	GameManager.started_boss_fight.emit()
+	GameManager.boss_health_updated.emit(current_health, max_health)
 	
 	# Optional: If the boss needs to move AROUND the arena, 
 	# you can enable movement here:
@@ -96,6 +98,7 @@ func start_fight():
 
 func take_damage(amount):
 	current_health -= amount
+	GameManager.boss_health_updated.emit(current_health, max_health)
 	if current_health <= 0:
 		print("boss died")
 		die()

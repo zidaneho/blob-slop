@@ -157,7 +157,13 @@ func handle_operation(operation: GameConfig.Operation, value: int):
 				target_count = current_count / value
 			else:
 				target_count = 1 # Fallback logic
-		
+		GameConfig.Operation.LOG:
+			# Safety: Can't log 0 or negative numbers, and base must be > 1
+			if current_count > 0 and value > 1:
+				# Change of Base Formula: log_b(x) = ln(x) / ln(b)
+				target_count = log(current_count) / log(value)
+			else:
+				target_count = 1 # Fallback
 	# Ensure we are between 0 and 500
 	target_count = min(max(0, target_count), 500)
 	

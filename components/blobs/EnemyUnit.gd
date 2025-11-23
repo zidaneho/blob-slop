@@ -76,8 +76,8 @@ func _on_contact(other):
 	# Note: Adjust group name if your unit's Area3D uses a different group
 	if other.is_in_group("player_units") or other.get_parent().is_in_group("units"):
 		var unit = other.get_parent()
-		if unit.has_method("die"):
-			unit.die() # Kill the player unit
+		if unit.has_method("take_damage"):
+			unit.take_damage(1)
 		else:
 			unit.queue_free()
 			
@@ -88,4 +88,5 @@ func take_damage(amount):
 	die()
 
 func die():
+	GameManager.add_score(10)
 	queue_free()

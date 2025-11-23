@@ -6,7 +6,7 @@ signal score_updated(new_score: int)
 signal high_score_updated(new_high_score: int)
 signal started_boss_fight
 signal ended_boss_fight
-
+signal boss_health_updated(current_hp: float, max_hp: float)
 # --- CONFIGURATION ---
 const SAVE_PATH = "user://blob_slop_save.data"
 
