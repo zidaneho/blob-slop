@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cmhvvriqhsqd1"]
+[gd_scene load_steps=6 format=3 uid="uid://cmhvvriqhsqd1"]
 
 [ext_resource type="Script" uid="uid://d3fsllk3i8gc7" path="res://components/blobs/EnemyUnit.gd" id="1_dceoi"]
 
@@ -10,12 +10,15 @@ albedo_color = Color(0.99215686, 0, 0, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_dceoi"]
 size = Vector3(0.8, 2, 0.8)
 
-[node name="Blob" type="Node3D"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_dceoi"]
+
+[node name="Blob" type="CharacterBody3D"]
 script = ExtResource("1_dceoi")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_jcb2t")
+skeleton = NodePath("")
 surface_material_override/0 = SubResource("StandardMaterial3D_dkkcj")
 
 [node name="KillArea" type="Area3D" parent="."]
@@ -23,3 +26,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.5)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KillArea"]
 shape = SubResource("BoxShape3D_dceoi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1.3891696, 0, 0, 0, 2.1699083, 0, 0, 0, 1.2812842, -0.022739053, 0.9653045, 0)
+shape = SubResource("SphereShape3D_dceoi")

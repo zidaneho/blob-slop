@@ -41,9 +41,10 @@ func _process(delta):
 		# We do NOT call super._process(delta)
 		global_position = global_position.lerp(target_position, delta * smoothing_speed)
 		
-		# Optional: Rotate to face the player unit
-		look_at_target(target_position, delta)
-		
+		var distance_sq = global_position.distance_squared_to(target_position)
+		var look_threshold = 0.01 # Only look if the target is more than 0.01 units away
+		if distance_sq > look_threshold * look_threshold:
+			look_at_target(target_position, delta)
 	else:
 		# If not active, do nothing (it will stick to the chunk automatically)
 		pass

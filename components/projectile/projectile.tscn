@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://cqehxbqn82k2y"]
+
+[ext_resource type="Script" uid="uid://cdlvhp4qvkfpn" path="res://components/projectile/projectile.gd" id="1_6ewyx"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_akgne"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_a85iw"]
+
+[node name="Projectile" type="CharacterBody3D"]
+script = ExtResource("1_6ewyx")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
+mesh = SubResource("SphereMesh_akgne")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
+shape = SubResource("SphereShape3D_a85iw")

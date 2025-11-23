@@ -133,6 +133,7 @@ vertical_alignment = 1
 
 [node name="OpeningMusic" type="AudioStreamPlayer2D" parent="Canvas/StartScreen"]
 stream = ExtResource("2_jkv2x")
+volume_db = 16.877
 
 [node name="GameOverScreen" type="ColorRect" parent="Canvas"]
 anchors_preset = 15
@@ -232,9 +233,9 @@ vertical_alignment = 1
 
 [node name="GameOverMusic" type="AudioStreamPlayer2D" parent="Canvas/GameOverScreen"]
 stream = ExtResource("2_a8y0u")
+volume_db = 24.0
 
 [node name="ScoreContainer" type="MarginContainer" parent="Canvas"]
-visible = false
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 16.0
@@ -304,5 +305,7 @@ shadow_enabled = true
 
 [node name="SpringMusic" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("16_jbj1t")
+volume_db = 24.0
 
 [node name="SpringMusicBoss" type="AudioStreamPlayer2D" parent="."]
+volume_db = 24.0

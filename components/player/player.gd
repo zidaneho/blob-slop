@@ -4,7 +4,7 @@ signal updated_unit_count(new_count : int)
 signal player_died
 
 # --- CONFIGURATION ---
-@export var movement_speed: float = 20
+@export var movement_speed: float = 10.0
 @export var formation_radius: float = 3.0
 @export var attack_range: float = 15.0
 @export var damage_per_unit : float = 1
@@ -158,7 +158,7 @@ func handle_operation(operation: GameConfig.Operation, value: int):
 				target_count = 1 # Fallback logic
 		
 	# Ensure we are between 0 and 500
-	target_count = min(500, max(0, target_count))
+	target_count = min(max(0, target_count), 500)
 	
 	updated_unit_count.emit(target_count)
 	

@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://qgm2mn130xfh"]
+[gd_scene load_steps=5 format=3 uid="uid://qgm2mn130xfh"]
 
 [ext_resource type="Script" uid="uid://cee33v7jivuhk" path="res://components/blobs/Unit.gd" id="1_1emtq"]
 
@@ -7,6 +7,8 @@
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dkkcj"]
 albedo_color = Color(0.56940794, 1, 1, 1)
 
+[sub_resource type="SphereMesh" id="SphereMesh_1emtq"]
+
 [node name="Blob" type="Node3D"]
 script = ExtResource("1_1emtq")
 
@@ -14,3 +16,10 @@ script = ExtResource("1_1emtq")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_jcb2t")
 surface_material_override/0 = SubResource("StandardMaterial3D_dkkcj")
+
+[node name="Projectile" type="CharacterBody3D" parent="MeshInstance3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D/Projectile"]
+mesh = SubResource("SphereMesh_1emtq")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/Projectile"]

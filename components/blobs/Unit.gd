@@ -2,7 +2,11 @@ class_name Unit extends Node3D
 
 # --- VISUAL SETTINGS ---
 @export var smoothing_speed: float = 10.0
-@export var attack_cooldown: float = 0.5
+
+# --- ATTACK CONFIGURATION ---
+@export var ATTACK_COOLDOWN: float = 0.25
+const PROJECTILE_SCENE: PackedScene = preload("res://components/projectile/projectile.tscn")
+@export var PROJECTILE_SPAWN_OFFSET: Vector3 = Vector3(0, 0.5, 0)
 
 # --- STATE (Managed by Player) ---
 var target_position: Vector3 = Vector3.ZERO
@@ -10,9 +14,8 @@ var target_enemy: Node3D = null
 var can_shoot: bool = true
 var attack_damage : float = 0
 
-
 # --- COMPONENTS ---
-@onready var model = $MeshInstance3D # Assuming you have a mesh child
+@onready var model = $MeshInstance3D 
 # @onready var gun_tip = $GunTip # Optional: spawn point for bullets
 
 func _ready():
@@ -24,16 +27,12 @@ func _ready():
 
 func _process(delta):
 	# 1. MOVEMENT (Visual Interpolation)
-	# The unit blindly slides towards where the Player tells it to be.
-	# This is much cheaper than pathfinding or rigid body physics for every unit.
 	global_position = global_position.lerp(target_position, delta * smoothing_speed)
 	
 	# 2. ROTATION
-	# Look at the enemy if we have one, otherwise look forward
 	if is_instance_valid(target_enemy):
 		look_at_target(target_enemy.global_position, delta)
 	else:
-		# Optional: Look in movement direction
 		var move_dir = target_position - global_position
 		if move_dir.length() > 0.1:
 			look_at_target(global_position + move_dir, delta)
@@ -56,17 +55,32 @@ func assign_target(enemy: Node3D):
 func trigger_attack():
 	if not can_shoot: return
 	if not is_instance_valid(target_enemy): return
+	if not PROJECTILE_SCENE: # Check if the scene is set
+		push_error("Projectile Scene not set on Unit!")
+		return
 	
-	# 1. Visuals
+	# 1. Spawn the projectile (replaces the direct damage call)
+	var missile = PROJECTILE_SCENE.instantiate()
+	get_tree().root.add_child(missile)
+	
+	# 2. Set spawn position and orientation
+	# Spawns the missile at the unit's position + offset
+	missile.global_transform = global_transform.translated(PROJECTILE_SPAWN_OFFSET)
+	
+	# 3. CRITICAL: Initialize the projectile
+	if missile.has_method("start_homing"):
+		# Pass the target node and the damage value
+		missile.start_homing(target_enemy, attack_damage)
+	else:
+		push_error("Projectile script is missing the 'start_homing' function! Projectile destroyed.")
+		missile.queue_free()
+		return
+		
+	# 4. Visuals and Cooldown
 	_play_shoot_visuals()
-	
-	# 2. DEAL DAMAGE (The missing link)
-	if target_enemy.has_method("take_damage"):
-		target_enemy.take_damage(attack_damage)
-	
-	# 3. Cooldown Logic
 	can_shoot = false
-	await get_tree().create_timer(0.5).timeout # Attack speed
+	# Use the exported attack_cooldown
+	await get_tree().create_timer(ATTACK_COOLDOWN).timeout 
 	can_shoot = true
 
 func _play_shoot_visuals():
@@ -74,9 +88,13 @@ func _play_shoot_visuals():
 	var tween = create_tween()
 	tween.tween_property(model, "scale", Vector3(1.2, 0.8, 1.2), 0.1)
 	tween.tween_property(model, "scale", Vector3(1.0, 1.0, 1.0), 0.1)
-	
-	# TODO: Spawn projectile scene here if needed
-	# var bullet = bullet_scene.instantiate()
-	# get_tree().root.add_child(bullet)
-	# bullet.global_position = global_position
 	pass
+	
+func take_damage(amount):
+	# If you had health, you'd apply damage here.
+	# For now, we assume this function will be called by another script.
+	die()
+
+func die():
+	# Implement any death visuals/sounds here before removal
+	queue_free()
