@@ -1,14 +1,37 @@
-[gd_scene load_steps=6 format=3 uid="uid://cbm8mrped3ppw"]
+[gd_scene load_steps=14 format=3 uid="uid://cbm8mrped3ppw"]
 
 [ext_resource type="Script" uid="uid://bxxajvgrnnmhr" path="res://components/player/player.gd" id="1_t3162"]
-[ext_resource type="PackedScene" uid="uid://qgm2mn130xfh" path="res://components/blobs/player_blob.tscn" id="2_kfe3d"]
+[ext_resource type="PackedScene" uid="uid://k16jxwy2wt5o" path="res://components/blobs/player_blob.tscn" id="2_kfe3d"]
+[ext_resource type="Texture2D" uid="uid://dlu2gol7gu1bk" path="res://assets/blobs/Player_Blob-1.png" id="3_pvtfm"]
+[ext_resource type="Texture2D" uid="uid://du0qwyb55pm8b" path="res://assets/blobs/Player_Blob-4.png" id="4_02tnr"]
+[ext_resource type="Texture2D" uid="uid://bv54kxu4ucvpw" path="res://assets/blobs/Player_Blob-2.png" id="5_bv0o5"]
+[ext_resource type="Texture2D" uid="uid://dg0h83jghir22" path="res://assets/blobs/Player_Blob-3.png" id="6_pxnim"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1v5o"]
-albedo_color = Color(0.4649247, 0.49995556, 1, 1)
+[sub_resource type="QuadMesh" id="QuadMesh_fwwnh"]
+size = Vector2(4, 4)
 
-[sub_resource type="BoxMesh" id="BoxMesh_t3162"]
-material = SubResource("StandardMaterial3D_f1v5o")
-size = Vector3(1, 2, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vxcs8"]
+transparency = 1
+albedo_texture = ExtResource("3_pvtfm")
+billboard_mode = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_16fba"]
+transparency = 1
+albedo_texture = ExtResource("4_02tnr")
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_hc4cx"]
+size = Vector2(4, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wmnke"]
+transparency = 1
+albedo_texture = ExtResource("5_bv0o5")
+billboard_mode = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v44tt"]
+transparency = 1
+albedo_texture = ExtResource("6_pxnim")
+billboard_mode = 1
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_t3162"]
 
@@ -17,8 +40,25 @@ script = ExtResource("1_t3162")
 unit_scene = ExtResource("2_kfe3d")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("BoxMesh_t3162")
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 1.7831035, 0)
+mesh = SubResource("QuadMesh_fwwnh")
+surface_material_override/0 = SubResource("StandardMaterial3D_vxcs8")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10147154, 0, 4.435462e-09)
+mesh = SubResource("QuadMesh_fwwnh")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_16fba")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MeshInstance3D"]
+mesh = SubResource("QuadMesh_hc4cx")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_wmnke")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="MeshInstance3D"]
+mesh = SubResource("QuadMesh_fwwnh")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_v44tt")
 
 [node name="SpringArm3D" type="SpringArm3D" parent="."]
 transform = Transform3D(-1, -4.371139e-08, 7.5710346e-08, 0, 0.8660254, 0.5, -8.742278e-08, 0.5, -0.8660254, 0, 2, 0)

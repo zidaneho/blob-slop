@@ -1,31 +1,35 @@
-class_name BossChunk extends Chunk
+class_name BossChunk extends Chunk # Ensure this inherits from your base Chunk class
 
-@onready var boss_unit = $BossUnit # Assign your boss node here
+@onready var boss_unit = $BossUnit 
 var player_ref: Player = null
+signal level_complete
 
 func _ready():
-	# Connect the trigger
-	$ArenaTrigger.body_entered.connect(_on_player_entered_arena)
+	# 1. Connect Trigger (Stops Player)
+	$ArenaTrigger.area_entered.connect(_on_player_entered_arena)
 	
-	# Connect the Boss Death signal (assuming your Boss emits "died")
-	# boss_unit.died.connect(_on_boss_defeated)
-
-func configure(biome: BiomeData):
-	# Call the normal chunk configuration to set ground/walls
-	# You can create a specific "Arena" look here if you want
-	super.configure(biome) 
+	# 2. Connect Boss Death (Resumes Player)
+	# We connect the signal from the boss node to our local function
+	print(boss_unit)
+	if boss_unit:
+		boss_unit.died.connect(_on_boss_defeated)
 
 func _on_player_entered_arena(body):
-	if body is Player:
-		player_ref = body
-		player_ref.is_movement_locked = true
-		# Start Boss Logic (Animation, Health Bar, etc.)
+	# This part is already correct in your file
+	print(body, body.get_parent() is Player)
+	if body.get_parent() is Player:
+		player_ref = body.get_parent()
+		player_ref.is_movement_locked = true # STOP
 		boss_unit.start_fight()
 
 func _on_boss_defeated():
-	# Unlock player so they run to the next chunk
+	# 3. Unlock Player
 	if player_ref:
-		player_ref.is_movement_locked = false
+		player_ref.is_movement_locked = false # GO
 	
-	# Optional: Reward the player
+	# Reward
 	GameManager.add_score(1000)
+	
+	# Optional: Despawn the wall so player can physically walk past
+	$ArenaTrigger.set_deferred("monitoring", false)
+	emit_signal("level_complete")

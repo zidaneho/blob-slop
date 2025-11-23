@@ -1,7 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://dv7ysojvneigg"]
+[gd_scene load_steps=15 format=3 uid="uid://dv7ysojvneigg"]
 
 [ext_resource type="Script" uid="uid://cbpafmex4rt7j" path="res://components/chunks/boss_chunk.gd" id="1_moqfe"]
 [ext_resource type="ArrayMesh" uid="uid://bl3n6qg8r28xv" path="res://assets/meshes/grass/grass_mesh.tres" id="2_ax3hi"]
+[ext_resource type="Script" uid="uid://dvohq8c347djo" path="res://components/blobs/BossUnit.gd" id="3_owh25"]
+[ext_resource type="PackedScene" uid="uid://ddlo8ktc7cwsy" path="res://components/blobs/BossProjectile.tscn" id="4_54r16"]
+[ext_resource type="Texture2D" uid="uid://c5j545fbe7f5" path="res://assets/blobs/Boss_Blob.png" id="4_cd22u"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_13bx1"]
 
@@ -29,8 +32,14 @@ buffer = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 [sub_resource type="BoxShape3D" id="BoxShape3D_moqfe"]
 size = Vector3(14.896912, 6.01355, 13.714844)
 
-[sub_resource type="BoxMesh" id="BoxMesh_moqfe"]
-size = Vector3(5, 5, 5)
+[sub_resource type="QuadMesh" id="QuadMesh_54r16"]
+size = Vector2(8, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l03ju"]
+transparency = 1
+albedo_texture = ExtResource("4_cd22u")
+billboard_mode = 1
+billboard_keep_scale = true
 
 [node name="BossChunk" type="Node3D"]
 script = ExtResource("1_moqfe")
@@ -62,6 +71,10 @@ shape = SubResource("BoxShape3D_moqfe")
 
 [node name="BossUnit" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 7.5)
+script = ExtResource("3_owh25")
+projectile_scene = ExtResource("4_54r16")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="BossUnit"]
-mesh = SubResource("BoxMesh_moqfe")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("QuadMesh_54r16")
+surface_material_override/0 = SubResource("StandardMaterial3D_l03ju")

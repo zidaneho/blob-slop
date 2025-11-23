@@ -31,6 +31,7 @@ func _ready() -> void:
 	GameManager.high_score_updated.connect(_on_high_score_updated)
 	start_screen.visible = true
 	score_label.visible = false
+	high_score_label.visible = false
 	game_over_screen.visible = false
 	stat_container.visible = false
 	spawn_entities()
@@ -58,8 +59,9 @@ func game_over():
 func _input(event: InputEvent) -> void:
 	if game_state == GameState.INACTIVE and (event.is_action_pressed("left") or event.is_action_pressed("right")):
 		game_state = GameState.ACTIVE
-		start_screen.visible = false;
-		score_label.visible = true;
+		start_screen.visible = false
+		high_score_label.visible = true
+		score_label.visible = true
 		score_label.text = "Score: 0"
 		stat_container.visible = true
 		stat_container.set_unit_count(0)
@@ -77,7 +79,7 @@ func spawn_entities():
 	if player_instance != null:
 		
 		add_child(player_instance)
-		
+		$MapGen.player = player_instance
 		player_instance.global_position = start_position
 		player_instance.player_died.connect(_on_game_over)
 func _on_score_updated(new_val):

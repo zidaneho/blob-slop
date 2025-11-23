@@ -25,7 +25,7 @@ func _ready() -> void:
 	add_to_group("units")
 
 func _physics_process(delta):
-	if not is_game_active or is_movement_locked:
+	if not is_game_active:
 		return
 	handle_movement(delta)
 	
@@ -43,7 +43,8 @@ func handle_movement(delta):
 	var input_dir = Vector3.ZERO
 	if Input.is_action_pressed("left"): input_dir.x += 1
 	if Input.is_action_pressed("right"): input_dir.x -= 1
-	input_dir.z += 1
+	if not is_movement_locked:
+		input_dir.z += 1	
 	
 	
 	if input_dir != Vector3.ZERO:

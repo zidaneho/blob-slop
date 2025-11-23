@@ -7,6 +7,8 @@ extends Node3D
 @export var boss_chunk_scene: PackedScene
 @export var enemy_scene : PackedScene
 
+var player 
+
 enum ChunkType { NORMAL, GATE, ENEMY,  BOSS }
 
 # Defines the pattern: 10 Normals -> 1 Gate -> 10 Normals -> 1 Boss
@@ -23,82 +25,79 @@ var active_chunks: Array[Node3D] = []
 
 # State
 var current_biome_index = 0
-var chunks_spawned = 0
-var biome_switch_threshold = 50 # Switch every 50 chunks (1000m)
+var transition_z: float = INF # The Z-coordinate where the new biome begins
+var pending_biome: BiomeData = null # The biome waiting to be revealed
+#var chunks_spawned = 0
+#var biome_switch_threshold = 50 # Switch every 50 chunks (1000m)
 
 func _ready():
 	var chunk_length = GameConfig.CHUNK_LENGTH
 	
 	for i in range(pool_size):
-		var type_to_spawn = ChunkType.NORMAL
-		
-		# SAFE ZONE: Force the first 3 chunks to be Normal
-		# This gives the player time to start running before hitting a gate/boss
-		if i < 3:
-			type_to_spawn = ChunkType.NORMAL
-		else:
-			# Use the pattern for everything else
-			type_to_spawn = spawn_pattern[pattern_index]
+		# Safe Zone logic
+		var type_to_spawn = ChunkType.NORMAL if i < 3 else spawn_pattern[pattern_index]
+		if i >= 3:
 			pattern_index = (pattern_index + 1) % spawn_pattern.size()
 		
-		# Create the chunk using our new helper
 		var chunk = spawn_chunk_of_type(type_to_spawn)
-		
 		add_child(chunk)
 		chunk.position.z = i * chunk_length
 		
-		# Configure visual biome
 		if chunk.has_method("configure"):
 			chunk.configure(biomes[current_biome_index])
 			
 		active_chunks.append(chunk)
 		
-	# Set initial environment
 	apply_environment_instant(biomes[current_biome_index])
-
-func update_chunk(player : Node3D):
-	# Check if the chunk behind the player is too far back
+func _process(delta: float) -> void:
+	if is_instance_valid(player):
+		update_chunk(player)
+func update_chunk(player: Node3D):
+	# 1. CHECK RECYCLING (Infinite Runner Logic)
 	var back_chunk = active_chunks[0]
 	if player.global_position.z > back_chunk.global_position.z + (GameConfig.CHUNK_LENGTH * 2):
 		recycle_chunk()
+		
+	# 2. CHECK BIOME TRANSITION (New Feature)
+	# We check if the player has crossed the "Seam" into the new territory
+	if transition_z != INF and player.global_position.z > transition_z:
+		perform_environment_transition()
 
 func recycle_chunk():
 	var chunk = active_chunks.pop_front()
 	var front_chunk = active_chunks.back()
 	
-	# 1. DECIDE TYPE
 	var current_type = spawn_pattern[pattern_index]
 	pattern_index = (pattern_index + 1) % spawn_pattern.size()
 	
-	# 2. MANAGE POOLING (Create New or Reuse)
+	# --- POOLING LOGIC ---
 	if current_type != ChunkType.NORMAL:
-		# Case A: Special Chunk (Boss/Gate/Enemy) -> Create New
 		chunk.queue_free() 
 		chunk = spawn_chunk_of_type(current_type)
 		add_child(chunk)
 		
+		# CONNECT BOSS SIGNAL
+		if current_type == ChunkType.BOSS:
+			# Note: We connect to 'on_boss_defeated', NOT 'perform_environment_transition'
+			if not chunk.is_connected("level_complete", on_boss_defeated):
+				chunk.level_complete.connect(on_boss_defeated)
+		
 	else:
-		# Case B: Normal Chunk needed
-		# If the old chunk was a special one, we must destroy it and make a normal one
 		if chunk.has_node("Gate") or chunk.has_node("BossUnit") or chunk.has_node("KillArea"):
 			chunk.queue_free()
 			chunk = spawn_chunk_of_type(ChunkType.NORMAL)
 			add_child(chunk)
-		else:
-			# Case C: Old chunk was Normal -> Reuse it (No code needed)
-			pass 
 
-	# 3. POSITION IT
+	# --- POSITION ---
 	chunk.position.z = front_chunk.position.z + GameConfig.CHUNK_LENGTH
 	
-	# 4. APPLY POP-UP ANIMATION (Applies to ALL types)
-	chunk.position.y = -10.0 # Start underground
-	
+	# --- ANIMATION ---
+	chunk.position.y = -10.0
 	var tween = create_tween()
-	# Pop up to y=0.0 over 0.5 seconds
 	tween.tween_property(chunk, "position:y", 0.0, 0.5).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	
-	# 5. CONFIGURE BIOME
+	# --- CONFIGURE ---
+	# This will use the NEW index if the boss just died
 	if chunk.has_method("configure"):
 		chunk.configure(biomes[current_biome_index])
 		
@@ -165,7 +164,7 @@ func spawn_chunk_of_type(type: ChunkType) -> Node3D:
 	match type:
 		ChunkType.BOSS:
 			new_chunk = boss_chunk_scene.instantiate()
-			
+			print("boss chunked spawn")
 		ChunkType.GATE:
 			# ... (existing gate logic) ...
 			var random_scene = gate_chunk_scene.pick_random()
@@ -195,3 +194,59 @@ func spawn_enemies_in_chunk(chunk: Node3D):
 		var z_pos = randf_range(2.0, GameConfig.CHUNK_LENGTH - 2.0)
 		
 		enemy.position = Vector3(x_pos, 0, z_pos)
+func on_boss_defeated():
+	# 1. SWITCH DATA IMMEDIATELY
+	current_biome_index = (current_biome_index + 1) % biomes.size()
+	var new_biome = biomes[current_biome_index]
+	
+	# 2. REPAINT FUTURE CHUNKS (The Fix)
+	# We look through the active chunks to find where the boss is,
+	# and update every chunk that comes AFTER it.
+	var boss_passed = false
+	
+	for chunk in active_chunks:
+		# Check if this is the boss chunk
+		if chunk is BossChunk or chunk.has_node("BossUnit"):
+			boss_passed = true
+			
+			# Set the visual transition to happen exactly when we leave this chunk
+			transition_z = chunk.position.z + GameConfig.CHUNK_LENGTH
+			continue # Don't change the boss chunk's ground
+			
+		if boss_passed:
+			# This chunk is AHEAD of the boss. Force it to the New Biome!
+			if chunk.has_method("configure"):
+				chunk.configure(new_biome)
+	
+	# 3. PREPARE VISUALS (Sky/Fog)
+	# This will be applied later by 'perform_environment_transition'
+	pending_biome = new_biome
+	
+	# Fallback: If boss wasn't found (rare), switch at the horizon
+	if not boss_passed:
+		transition_z = active_chunks.back().position.z
+
+func perform_environment_transition():
+	# Reset the trigger so it doesn't fire every frame
+	transition_z = INF 
+	
+	if not pending_biome: return
+	
+	# --- VISUAL TRANSITION EFFECT ---
+	var env = world_env.environment
+	var tween = create_tween()
+	
+	# 1. Fog thickens (Blinds the player)
+	tween.tween_property(env, "fog_density", 1.0, 1.0)
+	
+	await tween.finished
+	
+	# 2. Swap Sky/Light while blind
+	env.sky.sky_material.panorama = pending_biome.sky_texture
+	env.ambient_light_color = pending_biome.ambient_light_color
+	env.ambient_light_energy = pending_biome.ambient_light_energy
+	
+	# 3. Fog clears (Reveals new world)
+	var reveal = create_tween()
+	env.fog_light_color = pending_biome.fog_color 
+	reveal.tween_property(env, "fog_density", pending_biome.fog_density, 2.0)

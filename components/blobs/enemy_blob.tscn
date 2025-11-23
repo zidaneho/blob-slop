@@ -1,11 +1,15 @@
 [gd_scene load_steps=6 format=3 uid="uid://cmhvvriqhsqd1"]
 
 [ext_resource type="Script" uid="uid://d3fsllk3i8gc7" path="res://components/blobs/EnemyUnit.gd" id="1_dceoi"]
+[ext_resource type="Texture2D" uid="uid://di6swolh8c3yy" path="res://assets/blobs/Enemy_Blob.png" id="2_qi2l0"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_jcb2t"]
+[sub_resource type="QuadMesh" id="QuadMesh_2ao52"]
+size = Vector2(3, 3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dkkcj"]
-albedo_color = Color(0.99215686, 0, 0, 1)
+transparency = 1
+albedo_texture = ExtResource("2_qi2l0")
+billboard_mode = 1
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dceoi"]
 size = Vector3(0.8, 2, 0.8)
@@ -16,9 +20,8 @@ size = Vector3(0.8, 2, 0.8)
 script = ExtResource("1_dceoi")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("CapsuleMesh_jcb2t")
-skeleton = NodePath("")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("QuadMesh_2ao52")
 surface_material_override/0 = SubResource("StandardMaterial3D_dkkcj")
 
 [node name="KillArea" type="Area3D" parent="."]

@@ -1,25 +1,45 @@
-[gd_scene load_steps=5 format=3 uid="uid://qgm2mn130xfh"]
+[gd_scene load_steps=10 format=3 uid="uid://k16jxwy2wt5o"]
 
 [ext_resource type="Script" uid="uid://cee33v7jivuhk" path="res://components/blobs/Unit.gd" id="1_1emtq"]
+[ext_resource type="Texture2D" uid="uid://dlu2gol7gu1bk" path="res://assets/blobs/Player_Blob-1.png" id="2_gsuud"]
+[ext_resource type="Texture2D" uid="uid://bv54kxu4ucvpw" path="res://assets/blobs/Player_Blob-2.png" id="4_0sxxk"]
+[ext_resource type="Texture2D" uid="uid://dg0h83jghir22" path="res://assets/blobs/Player_Blob-3.png" id="5_ppmer"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_jcb2t"]
+[sub_resource type="QuadMesh" id="QuadMesh_phmjw"]
+size = Vector2(2, 2)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dkkcj"]
-albedo_color = Color(0.56940794, 1, 1, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xgs6l"]
+transparency = 1
+albedo_texture = ExtResource("2_gsuud")
+billboard_mode = 1
 
-[sub_resource type="SphereMesh" id="SphereMesh_1emtq"]
+[sub_resource type="QuadMesh" id="QuadMesh_pnqe3"]
+size = Vector2(2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j05gu"]
+transparency = 1
+albedo_texture = ExtResource("4_0sxxk")
+billboard_mode = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h26h7"]
+transparency = 1
+albedo_texture = ExtResource("5_ppmer")
+billboard_mode = 1
 
 [node name="Blob" type="Node3D"]
 script = ExtResource("1_1emtq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("CapsuleMesh_jcb2t")
-surface_material_override/0 = SubResource("StandardMaterial3D_dkkcj")
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0.98026395, 0)
+mesh = SubResource("QuadMesh_phmjw")
+surface_material_override/0 = SubResource("StandardMaterial3D_xgs6l")
 
-[node name="Projectile" type="CharacterBody3D" parent="MeshInstance3D"]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MeshInstance3D"]
+mesh = SubResource("QuadMesh_pnqe3")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_j05gu")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D/Projectile"]
-mesh = SubResource("SphereMesh_1emtq")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/Projectile"]
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="MeshInstance3D"]
+mesh = SubResource("QuadMesh_phmjw")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_h26h7")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dewpu7on3b3gh"]
+[gd_scene load_steps=21 format=3 uid="uid://dewpu7on3b3gh"]
 
 [ext_resource type="Script" uid="uid://d0mt71f4h0xtm" path="res://game/managers/main.gd" id="1_tefeu"]
 [ext_resource type="AudioStream" uid="uid://bj652uh4ufya6" path="res://music/game_over.wav" id="2_a8y0u"]
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://boqb6artg12de" path="res://components/chunks/Gate3Chunk.tscn" id="9_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://cmhvvriqhsqd1" path="res://components/blobs/enemy_blob.tscn" id="13_trceg"]
 [ext_resource type="AudioStream" uid="uid://xrmg8vhega2g" path="res://music/spring_level.wav" id="16_jbj1t"]
+[ext_resource type="AudioStream" uid="uid://cuisqu13cj16l" path="res://music/spring_level_boss.wav" id="17_muem4"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_nqv1k"]
 panorama = ExtResource("2_o6xl0")
@@ -42,7 +43,6 @@ start_position = Vector3(0, 0, 5)
 [node name="Canvas" type="CanvasLayer" parent="."]
 
 [node name="StartScreen" type="ColorRect" parent="Canvas"]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -133,7 +133,6 @@ vertical_alignment = 1
 
 [node name="OpeningMusic" type="AudioStreamPlayer2D" parent="Canvas/StartScreen"]
 stream = ExtResource("2_jkv2x")
-volume_db = 16.877
 
 [node name="GameOverScreen" type="ColorRect" parent="Canvas"]
 anchors_preset = 15
@@ -233,7 +232,6 @@ vertical_alignment = 1
 
 [node name="GameOverMusic" type="AudioStreamPlayer2D" parent="Canvas/GameOverScreen"]
 stream = ExtResource("2_a8y0u")
-volume_db = 24.0
 
 [node name="ScoreContainer" type="MarginContainer" parent="Canvas"]
 anchors_preset = 10
@@ -305,7 +303,6 @@ shadow_enabled = true
 
 [node name="SpringMusic" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("16_jbj1t")
-volume_db = 24.0
 
 [node name="SpringMusicBoss" type="AudioStreamPlayer2D" parent="."]
-volume_db = 24.0
+stream = ExtResource("17_muem4")
