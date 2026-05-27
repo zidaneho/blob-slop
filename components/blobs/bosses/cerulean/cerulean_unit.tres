@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://6l22fdp5p5db"]
+
+[ext_resource type="PackedScene" uid="uid://def4biprjhkn5" path="res://components/blobs/bosses/cerulean/cerulean_data.tscn" id="1_elani"]
+[ext_resource type="Script" uid="uid://dj0dgcsju7gcr" path="res://components/blobs/bosses/BossData.gd" id="2_2jau3"]
+
+[resource]
+script = ExtResource("2_2jau3")
+name = "The Cerulean"
+description = "Blue blob"
+scene = ExtResource("1_elani")

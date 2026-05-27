@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://b4abaubu5km84"]
+
+[ext_resource type="PackedScene" uid="uid://cp7sarnn1fv3a" path="res://components/blobs/bosses/overgrowth/overgrowth_unit.tscn" id="1_wotae"]
+[ext_resource type="Script" uid="uid://dj0dgcsju7gcr" path="res://components/blobs/bosses/BossData.gd" id="2_0l1xi"]
+
+[resource]
+script = ExtResource("2_0l1xi")
+name = "The Overgrowth"
+description = "Green blob"
+scene = ExtResource("1_wotae")

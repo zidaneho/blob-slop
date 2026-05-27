@@ -7,8 +7,9 @@ signal gate_triggered
 
 # Color Configuration
 # Blue/Green for positive, Red for negative. Alpha (0.5) keeps it transparent.
-@export var color_positive: Color = Color(0.2, 0.6, 1.0, 0.5) 
+@export var color_positive: Color = Color(0.2, 0.6, 1.0, 0.5)
 @export var color_negative: Color = Color(1.0, 0.2, 0.2, 0.5)
+@export var color_neutral: Color = Color(0.6, 0.6, 0.6, 0.5)
 
 @onready var value_label = $Label3D
 @onready var panel = $Panel
@@ -29,47 +30,45 @@ func update_visuals():
 	if not value_label: return
 	
 	value_label.text = ""
-	var is_positive = false
-	
+	var tint = color_negative
+	var show_value = true
+
 	match operation:
 		GameConfig.Operation.ADD:
-			value_label.text += "+"
-			is_positive = true
+			value_label.text = "+"
+			tint = color_positive
 		GameConfig.Operation.SUBTRACT:
-			value_label.text += "-"
-			is_positive = false
+			value_label.text = "-"
+			tint = color_negative
 		GameConfig.Operation.MULTIPLY:
-			value_label.text += "x"
-			is_positive = true
+			value_label.text = "x"
+			tint = color_positive
 		GameConfig.Operation.DIVIDE:
-			value_label.text += "÷"
-			is_positive = false
+			value_label.text = "÷"
+			tint = color_negative
 		GameConfig.Operation.LOG:
-			value_label.text = "log" # "log2" or "log10" handled below
-			is_positive = false # Log drastically reduces count, so it's "bad/red"
-		
-	if operation == GameConfig.Operation.LOG:
+			value_label.text = "log"
+			tint = color_negative
+		GameConfig.Operation.RANDOM:
+			value_label.text = "RANDOM"
+			tint = color_neutral
+			show_value = false
+		GameConfig.Operation.SQRT:
+			value_label.text = "SQRT"
+			tint = color_negative
+			show_value = false
+
+	if show_value:
 		value_label.text += str(value)
-	else:
-		value_label.text += str(value)
-	
+
 	# 2. UPDATE PANEL COLOR
 	if panel:
-		# Get the material currently assigned to the panel
 		var mat = panel.get_surface_override_material(0)
-		
 		if mat:
-			# IMPORTANT: Duplicate the material so we don't change 
-			# the color of every other gate in the game at the same time.
 			if not mat.resource_local_to_scene:
 				mat = mat.duplicate()
 				panel.set_surface_override_material(0, mat)
-			
-			# Apply the tint
-			if is_positive:
-				mat.albedo_color = color_positive
-			else:
-				mat.albedo_color = color_negative
+			mat.albedo_color = tint
 
 func _on_area_3d_area_entered(area: Area3D) -> void:
 	if area.is_in_group("players"): # Ensure your Player area is in this group

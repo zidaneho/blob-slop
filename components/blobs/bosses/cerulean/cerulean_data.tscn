@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://def4biprjhkn5"]
+
+[ext_resource type="Script" uid="uid://dvohq8c347djo" path="res://components/blobs/bosses/BossUnit.gd" id="1_s0h42"]
+[ext_resource type="PackedScene" uid="uid://ddlo8ktc7cwsy" path="res://components/blobs/bosses/BossProjectile.tscn" id="2_u7x5p"]
+[ext_resource type="Texture2D" uid="uid://c5j545fbe7f5" path="res://assets/blobs/Boss_Blob.png" id="3_1cc6g"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_54r16"]
+size = Vector2(8, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l03ju"]
+transparency = 1
+albedo_color = Color(0.09035171, 0.54155755, 0.8188113, 1)
+albedo_texture = ExtResource("3_1cc6g")
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cd22u"]
+radius = 1.0
+height = 8.0
+
+[node name="BossUnit" type="CharacterBody3D" unique_id=1249602805]
+collision_layer = 8
+script = ExtResource("1_s0h42")
+projectile_scene = ExtResource("2_u7x5p")
+boss_damage = 1.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=376594232]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.189497, 0)
+mesh = SubResource("QuadMesh_54r16")
+surface_material_override/0 = SubResource("StandardMaterial3D_l03ju")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=249606516]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+shape = SubResource("CapsuleShape3D_cd22u")

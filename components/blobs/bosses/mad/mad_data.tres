@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://cbk2vigeq5757"]
+
+[ext_resource type="PackedScene" uid="uid://dvo2wqtosal8" path="res://components/blobs/bosses/mad/mad_unit.tscn" id="1_cwxy7"]
+[ext_resource type="Script" uid="uid://dj0dgcsju7gcr" path="res://components/blobs/bosses/BossData.gd" id="2_nq4if"]
+
+[resource]
+script = ExtResource("2_nq4if")
+name = "The Madness"
+description = "yellow blob"
+scene = ExtResource("1_cwxy7")

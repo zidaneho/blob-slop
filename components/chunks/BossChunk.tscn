@@ -1,10 +1,7 @@
-[gd_scene load_steps=16 format=3 uid="uid://dv7ysojvneigg"]
+[gd_scene format=3 uid="uid://dv7ysojvneigg"]
 
 [ext_resource type="Script" uid="uid://cbpafmex4rt7j" path="res://components/chunks/boss_chunk.gd" id="1_moqfe"]
 [ext_resource type="ArrayMesh" uid="uid://bl3n6qg8r28xv" path="res://assets/meshes/grass/grass_mesh.tres" id="2_ax3hi"]
-[ext_resource type="Script" uid="uid://dvohq8c347djo" path="res://components/blobs/BossUnit.gd" id="3_owh25"]
-[ext_resource type="PackedScene" uid="uid://ddlo8ktc7cwsy" path="res://components/blobs/BossProjectile.tscn" id="4_54r16"]
-[ext_resource type="Texture2D" uid="uid://c5j545fbe7f5" path="res://assets/blobs/Boss_Blob.png" id="4_cd22u"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_13bx1"]
 
@@ -32,59 +29,34 @@ buffer = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 [sub_resource type="BoxShape3D" id="BoxShape3D_moqfe"]
 size = Vector3(14.896912, 6.01355, 13.714844)
 
-[sub_resource type="QuadMesh" id="QuadMesh_54r16"]
-size = Vector2(8, 8)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l03ju"]
-transparency = 1
-albedo_texture = ExtResource("4_cd22u")
-billboard_mode = 1
-billboard_keep_scale = true
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cd22u"]
-radius = 1.0
-height = 8.0
-
-[node name="BossChunk" type="Node3D"]
+[node name="BossChunk" type="Node3D" unique_id=423266710]
 script = ExtResource("1_moqfe")
 
-[node name="Ground" type="MeshInstance3D" parent="."]
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=1674987677]
 transform = Transform3D(15, 0, 0, 0, 1, 0, 0, 0, 15, 0, -0.5, 7.5)
 mesh = SubResource("BoxMesh_13bx1")
 surface_material_override/0 = SubResource("StandardMaterial3D_qgl1l")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Ground"]
+[node name="StaticBody3D" type="StaticBody3D" parent="Ground" unique_id=659677201]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/StaticBody3D" unique_id=217926269]
 shape = SubResource("BoxShape3D_13bx1")
 
-[node name="Grass" type="MultiMeshInstance3D" parent="."]
+[node name="Grass" type="MultiMeshInstance3D" parent="." unique_id=585744668]
 multimesh = SubResource("MultiMesh_qgl1l")
 
-[node name="Rocks" type="MultiMeshInstance3D" parent="."]
+[node name="Rocks" type="MultiMeshInstance3D" parent="." unique_id=223677840]
 multimesh = SubResource("MultiMesh_ivmp4")
 
-[node name="Decor" type="MultiMeshInstance3D" parent="."]
+[node name="Decor" type="MultiMeshInstance3D" parent="." unique_id=2012611454]
 multimesh = SubResource("MultiMesh_n3w3y")
 
-[node name="ArenaTrigger" type="Area3D" parent="."]
+[node name="ArenaTrigger" type="Area3D" parent="." unique_id=1125493586]
 collision_mask = 4
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ArenaTrigger"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ArenaTrigger" unique_id=2073080858]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1715393, 2.506775, 8.003906)
 shape = SubResource("BoxShape3D_moqfe")
 
-[node name="BossUnit" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 7.5)
-collision_layer = 8
-script = ExtResource("3_owh25")
-projectile_scene = ExtResource("4_54r16")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="BossUnit"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("QuadMesh_54r16")
-surface_material_override/0 = SubResource("StandardMaterial3D_l03ju")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="BossUnit"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-shape = SubResource("CapsuleShape3D_cd22u")
+[node name="BossSpawnPoint" type="Marker3D" parent="." unique_id=361596350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.104135)

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://i1mponjtxt2s"]
+
+[ext_resource type="PackedScene" uid="uid://q2jug7skt7mp" path="res://components/blobs/bosses/crucible/crucible_unit.tscn" id="1_tfv0m"]
+[ext_resource type="Script" uid="uid://dj0dgcsju7gcr" path="res://components/blobs/bosses/BossData.gd" id="2_bfl26"]
+
+[resource]
+script = ExtResource("2_bfl26")
+name = "The Crucible"
+description = "orange blob"
+scene = ExtResource("1_tfv0m")

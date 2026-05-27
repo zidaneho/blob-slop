@@ -1,53 +1,50 @@
 class_name BossChunk extends Chunk # Ensure this inherits from your base Chunk class
 
-@onready var boss_unit = $BossUnit 
-var player_ref: Player = null
+# Boss difficulty scales as base * growth^tier. Growth values are small so the
+# curve only really separates from linear after a handful of tiers.
+const HEALTH_BASE: float = 250.0
+const HEALTH_GROWTH: float = 1.2
+const DAMAGE_BASE: float = 1.0
+const DAMAGE_GROWTH: float = 1.5
+
+@onready var boss_spawn_point = $BossSpawnPoint
+@export var boss_scene : PackedScene
+var boss_instance : Boss
+var difficulty_tier: int = 0
 signal level_complete
 
 func _ready():
-	# 1. Connect Trigger (Stops Player)
 	$ArenaTrigger.area_entered.connect(_on_player_entered_arena)
-	
-	# 2. Connect Boss Death (Resumes Player)
-	# We connect the signal from the boss node to our local function
-	print(boss_unit)
-	if boss_unit:
-		boss_unit.died.connect(_on_boss_defeated)
+	_spawn_boss()
+
+func configure_boss_scene(scene : PackedScene, tier : int):
+	# Called by ProceduralMapGenerator before this chunk enters the tree, so we
+	# can't touch @onready vars yet. Stash params; _ready does the spawn.
+	boss_scene = scene
+	difficulty_tier = tier
+
+func _spawn_boss():
+	if not boss_scene:
+		push_error("BossChunk: boss_scene not configured")
+		return
+	boss_instance = boss_scene.instantiate() as Boss
+	boss_instance.max_health = HEALTH_BASE * pow(HEALTH_GROWTH, difficulty_tier)
+	boss_instance.current_health = boss_instance.max_health
+	boss_instance.boss_damage = DAMAGE_BASE * pow(DAMAGE_GROWTH, difficulty_tier)
+	boss_instance.died.connect(_on_boss_defeated)
+	# Parent under the spawn point so the boss rides the chunk into position.
+	# start_fight() detaches it to root once the fight begins.
+	boss_spawn_point.add_child(boss_instance)
 
 func _on_player_entered_arena(body):
-	# This part is already correct in your file
-	print(body, body.get_parent() is Player)
 	if body.get_parent() is Player:
-		player_ref = body.get_parent()
-		player_ref.is_movement_locked = true # STOP
-		boss_unit.start_fight()
+		if boss_instance:
+			boss_instance.start_fight()
+		else:
+			push_error("Boss instance not configured yet!")
 
 func _on_boss_defeated():
-	# 3. Unlock Player
-	if player_ref:
-		player_ref.is_movement_locked = false # GO
-	
-	# Reward
 	GameManager.add_score(1000)
-	
-	# Optional: Despawn the wall so player can physically walk past
+	# Despawn the wall so the player can physically walk past.
 	$ArenaTrigger.set_deferred("monitoring", false)
 	emit_signal("level_complete")
-func setup_boss_stats(difficulty_tier: int):
-	# Wait for children to be ready if called immediately after instantiation
-	if not boss_unit: 
-		await ready
-	
-	if boss_unit:
-		# Example Scaling:
-		# HP: +50% per biome (100 -> 150 -> 200...)
-		# DMG: +20% per biome (5 -> 6 -> 7...)
-		
-		var health_mult = 1.0 + (difficulty_tier * 0.5)
-		var damage_mult = 1.0 + (difficulty_tier * 0.2)
-		
-		boss_unit.max_health = round(boss_unit.max_health * health_mult)
-		boss_unit.current_health = boss_unit.max_health # IMPORTANT: Reset current HP
-		boss_unit.boss_damage = boss_unit.boss_damage * damage_mult
-		
-		print("Boss Spawned! Tier: ", difficulty_tier, " | HP: ", boss_unit.max_health)

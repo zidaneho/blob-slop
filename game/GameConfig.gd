@@ -17,4 +17,7 @@ enum Operation {
 	SUBTRACT,
 	DIVIDE,
 	LOG,
+
+	RANDOM,
+	SQRT
 }

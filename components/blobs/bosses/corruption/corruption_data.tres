@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://cohstb6x72ymn"]
+
+[ext_resource type="PackedScene" uid="uid://c4gfqu72npant" path="res://components/blobs/bosses/corruption/corruption_unit.tscn" id="1_fy4ru"]
+[ext_resource type="Script" uid="uid://dj0dgcsju7gcr" path="res://components/blobs/bosses/BossData.gd" id="2_cvkau"]
+
+[resource]
+script = ExtResource("2_cvkau")
+name = "The Corruption"
+description = "purple blob"
+scene = ExtResource("1_fy4ru")

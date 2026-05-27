@@ -8,8 +8,10 @@ signal player_died
 @export var formation_radius: float = 3.0
 @export var attack_range: float = 15.0
 @export var damage_per_unit : float = 1
+@export var unit_attack_cooldown: float = 0.25
+@export var max_projectiles_per_frame: int = 6
 @export var unit_scene: PackedScene
-@onready var collision_area = $Area3D/CollisionShape3D
+# @onready var collision_area = $Area3D/CollisionShape3D
 
 var is_movement_locked: bool = false
 
@@ -20,9 +22,13 @@ var enemy_scan_timer: float = 0.0
 # Cache known enemies to avoid finding them every frame
 var nearby_enemies: Array[Node3D] = []
 var is_game_active : bool = false
+var _swarm_renderer: SwarmRenderer
 
 func _ready() -> void:
 	add_to_group("units")
+	add_to_group("player")
+	_swarm_renderer = SwarmRenderer.new()
+	add_child(_swarm_renderer)
 
 func _physics_process(delta):
 	if not is_game_active:
@@ -34,8 +40,8 @@ func _physics_process(delta):
 	if enemy_scan_timer > 0.1:
 		scan_for_enemies()
 		enemy_scan_timer = 0.0
-	
-	update_unit_commands()
+
+	update_unit_commands(delta)
 
 # --- MOVEMENT ---
 
@@ -44,67 +50,90 @@ func handle_movement(delta):
 	if Input.is_action_pressed("left"): input_dir.x += 1
 	if Input.is_action_pressed("right"): input_dir.x -= 1
 	if not is_movement_locked:
-		input_dir.z += 1	
-	
-	
+		input_dir.z += 1
+
+	var limit = GameConfig.HALF_WIDTH
+	if (global_position.x >= limit and input_dir.x > 0) or (global_position.x <= -limit and input_dir.x < 0):
+		input_dir.x = 0
+
 	if input_dir != Vector3.ZERO:
 		input_dir = input_dir.normalized()
 		global_position += input_dir * movement_speed * delta
-	var limit = GameConfig.HALF_WIDTH
 	global_position.x = clamp(global_position.x, -limit, limit)
 # --- UNIT LOGIC ---
 
 func register_unit(unit: Node3D):
 	if unit is Unit and not units.has(unit):
 		units.append(unit)
-		# Assign a random offset so they don't stack on top of each other
-		unit.set_meta("formation_offset", Vector3(
+		unit.formation_offset = Vector3(
 			randf_range(-formation_radius, formation_radius),
-			0, 
+			0,
 			randf_range(-formation_radius, formation_radius)
-		))
+		)
+		# SwarmRenderer draws all minions in a few MultiMesh draw calls; hide
+		# the per-unit MeshInstance3D so we don't pay for both.
+		if unit.model:
+			unit.model.visible = false
 
-func update_unit_commands():
-	# This loop handles BOTH movement and shooting orders
-	# We do it in one pass for performance
-	
+func update_unit_commands(delta: float):
+	# Single pass: formation target, movement lerp, look_at, targeting.
+	# Damage is aggregated per-target across the swarm (one take_damage per
+	# target per frame instead of one-per-projectile-per-unit) so unit count
+	# can scale without exploding the projectile/damage call count.
+	var boundary = GameConfig.HALF_WIDTH
+	var attack_range_sq = attack_range * attack_range
+	var dps_per_unit := damage_per_unit / unit_attack_cooldown if unit_attack_cooldown > 0.0 else damage_per_unit
+
+	var damage_per_target: Dictionary = {}
+	var shot_candidates: Array = []
+
 	for unit in units:
-		# 1. CALCULATE BASE TARGET
-		var offset = unit.get_meta("formation_offset")
-		var desired_pos = global_position + offset
-		
-		# 2. HANDLE WALL COLLISIONS (The "Smear" Effect)
-		var boundary = GameConfig.HALF_WIDTH
-		
-		# Right Wall Check
+		var desired_pos = global_position + unit.formation_offset
+
+		# Wall "smear" effect
 		if desired_pos.x > boundary:
 			var excess = desired_pos.x - boundary
 			desired_pos.x = boundary
-			# Push unit BACKWARD along the wall based on how far out they were
-			# (We use -excess so they trail behind slightly)
-			desired_pos.z += excess 
-			
-		# Left Wall Check
+			desired_pos.z += excess
 		elif desired_pos.x < -boundary:
-			var excess = desired_pos.x - (-boundary) # This will be negative
+			var excess = desired_pos.x + boundary
 			desired_pos.x = -boundary
-			# excess is negative here, so -= adds to Z
-			desired_pos.z -= excess 
-			
-		# 3. SEND COMMAND
-		unit.set_formation_target(desired_pos)
-		
-		# 2. COMBAT LOGIC
-		# Find the closest enemy from our cached list
+			desired_pos.z -= excess
+
+		# Movement lerp (was Unit._process)
+		var unit_pos = unit.global_position
+		unit.global_position = unit_pos.lerp(desired_pos, delta * unit.smoothing_speed)
+
+		# Targeting (no per-unit shoot — see aggregate damage below)
 		var target = get_closest_enemy(unit.global_position)
-		
 		if target:
 			unit.assign_target(target)
-			# Check distance (sqr_magnitude is faster than length)
-			if unit.global_position.distance_squared_to(target.global_position) < attack_range * attack_range:
-				unit.trigger_attack()
+			unit.look_at_target(target.global_position, delta)
+			if unit.global_position.distance_squared_to(target.global_position) < attack_range_sq:
+				damage_per_target[target] = damage_per_target.get(target, 0.0) + dps_per_unit
+				shot_candidates.append(unit)
 		else:
 			unit.assign_target(null)
+			var move_dir = desired_pos - unit_pos
+			if move_dir.length_squared() > 0.01:
+				unit.look_at_target(unit_pos + move_dir, delta)
+
+	# Apply aggregated swarm DPS to each unique target (one call per target).
+	for target in damage_per_target:
+		if is_instance_valid(target) and target.has_method("take_damage"):
+			target.take_damage(damage_per_target[target] * delta)
+
+	# Visual: spawn a capped number of cosmetic projectiles so the swarm still
+	# looks like it's shooting, independent of how many units are in range.
+	var candidate_count := shot_candidates.size()
+	if candidate_count > 0:
+		var shot_count := mini(max_projectiles_per_frame, candidate_count)
+		for i in range(shot_count):
+			var unit: Unit = shot_candidates[randi() % candidate_count]
+			unit.fire_cosmetic_projectile()
+
+	if _swarm_renderer:
+		_swarm_renderer.sync(units)
 
 func scan_for_enemies():
 	# Assuming you put enemies in a group named "enemies"
@@ -164,9 +193,14 @@ func handle_operation(operation: GameConfig.Operation, value: int):
 				target_count = log(current_count) / log(value)
 			else:
 				target_count = 1 # Fallback
-	# Ensure we are between 0 and 500
-	target_count = min(max(0, target_count), 500)
-	
+		GameConfig.Operation.RANDOM:
+			target_count = max(0,current_count + randi_range(-10, 50))
+		GameConfig.Operation.SQRT:
+			if current_count > 0:
+				target_count = int(sqrt(current_count))
+			else:
+				target_count = 0
+
 	updated_unit_count.emit(target_count)
 	
 	# --- ADJUST SWARM SIZE ---

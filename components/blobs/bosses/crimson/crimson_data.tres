@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://cg62ild2s5ouf"]
+
+[ext_resource type="PackedScene" uid="uid://ivrkqqr5yrxu" path="res://components/blobs/bosses/crimson/crimson_unit.tscn" id="1_rclhw"]
+[ext_resource type="Script" uid="uid://dj0dgcsju7gcr" path="res://components/blobs/bosses/BossData.gd" id="2_gpagq"]
+
+[resource]
+script = ExtResource("2_gpagq")
+name = "The Crimson"
+description = "Red blob"
+scene = ExtResource("1_rclhw")

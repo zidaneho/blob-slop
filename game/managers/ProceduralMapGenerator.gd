@@ -6,19 +6,28 @@ extends Node3D
 @export var gate_chunk_scene : Array[PackedScene]
 @export var boss_chunk_scene: PackedScene
 @export var enemy_scene : PackedScene
+@export var boss_pool : BossPool
+
+var last_boss_index = INF
 
 var player 
 
 enum ChunkType { NORMAL, GATE, ENEMY,  BOSS }
 
-# Defines the pattern: 10 Normals -> 1 Gate -> 10 Normals -> 1 Boss
 var spawn_pattern = [
-	ChunkType.GATE, ChunkType.NORMAL, ChunkType.ENEMY, 
+	ChunkType.GATE, ChunkType.NORMAL, 
 	ChunkType.GATE, ChunkType.ENEMY, ChunkType.GATE, 
-	ChunkType.ENEMY, ChunkType.NORMAL, ChunkType.BOSS
+	ChunkType.ENEMY, ChunkType.NORMAL, 
+	
+	ChunkType.GATE, ChunkType.GATE, ChunkType.ENEMY,
+	ChunkType.NORMAL, ChunkType.ENEMY, ChunkType.GATE,
+
+	ChunkType.BOSS,
+	ChunkType.NORMAL, ChunkType.NORMAL, ChunkType.NORMAL
 ]
 var pattern_index = 0
 var difficulty_tier: int = 0
+var boss_fight_active: bool = false
 # Config
 var pool_size = 5
 var active_chunks: Array[Node3D] = []
@@ -31,8 +40,11 @@ var pending_biome: BiomeData = null # The biome waiting to be revealed
 #var biome_switch_threshold = 50 # Switch every 50 chunks (1000m)
 var first_gate_spawned: bool = false
 func _ready():
+	GameManager.started_boss_fight.connect(_on_boss_fight_started)
+	GameManager.ended_boss_fight.connect(_on_boss_fight_ended)
+
 	var chunk_length = GameConfig.CHUNK_LENGTH
-	
+
 	for i in range(pool_size):
 		# Safe Zone logic
 		var type_to_spawn = ChunkType.NORMAL if i < 3 else spawn_pattern[pattern_index]
@@ -49,10 +61,10 @@ func _ready():
 		active_chunks.append(chunk)
 		
 	apply_environment_instant(biomes[current_biome_index])
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if is_instance_valid(player):
 		update_chunk(player)
-func update_chunk(player: Node3D):
+func update_chunk(_player: Node3D):
 	# 1. CHECK RECYCLING (Infinite Runner Logic)
 	var back_chunk = active_chunks[0]
 	if player.global_position.z > back_chunk.global_position.z + (GameConfig.CHUNK_LENGTH * 2):
@@ -67,8 +79,15 @@ func recycle_chunk():
 	var chunk = active_chunks.pop_front()
 	var front_chunk = active_chunks.back()
 	
-	var current_type = spawn_pattern[pattern_index]
-	pattern_index = (pattern_index + 1) % spawn_pattern.size()
+	# During a boss fight, freeze the pattern and only spawn empty NORMAL chunks
+	# so the chase corridor stays clean. The pattern resumes from where we left
+	# off once the fight ends.
+	var current_type: ChunkType
+	if boss_fight_active:
+		current_type = ChunkType.NORMAL
+	else:
+		current_type = spawn_pattern[pattern_index]
+		pattern_index = (pattern_index + 1) % spawn_pattern.size()
 	
 	# --- POOLING LOGIC ---
 	if current_type != ChunkType.NORMAL:
@@ -76,14 +95,8 @@ func recycle_chunk():
 		chunk = spawn_chunk_of_type(current_type)
 		add_child(chunk)
 		
-		# CONNECT BOSS SIGNAL
-		if current_type == ChunkType.BOSS:
-			# Note: We connect to 'on_boss_defeated', NOT 'perform_environment_transition'
-			if not chunk.is_connected("level_complete", on_boss_defeated):
-				chunk.level_complete.connect(on_boss_defeated)
-		
 	else:
-		if chunk.has_node("Gate") or chunk.has_node("BossUnit") or chunk.has_node("KillArea"):
+		if chunk is BossChunk:
 			chunk.queue_free()
 			chunk = spawn_chunk_of_type(ChunkType.NORMAL)
 			add_child(chunk)
@@ -140,26 +153,34 @@ func apply_environment_instant(biome: BiomeData):
 	env.fog_density = biome.fog_density
 	env.ambient_light_color = biome.ambient_light_color
 func randomize_gate(gate: Gate):
-	# 1. Pick a random Math Operation (Add, Sub, Mult, Div)
-	var op_index = randi() % 4 
-	var operation = GameConfig.Operation.values()[op_index]
+	# 1. Pick a random Math Operation
+	var possible_ops = [
+		GameConfig.Operation.ADD,
+		GameConfig.Operation.MULTIPLY,
+		GameConfig.Operation.SUBTRACT,
+		GameConfig.Operation.DIVIDE,
+		GameConfig.Operation.RANDOM,
+		GameConfig.Operation.SQRT,
+	]
+	var operation = possible_ops.pick_random()
 	var val = 0
-	
+
 	# 2. Pick a "Fair" Number based on the operation
 	match operation:
-		GameConfig.Operation.ADD: 
+		GameConfig.Operation.ADD:
 			val = randi_range(5, 25)
-		GameConfig.Operation.SUBTRACT: 
+		GameConfig.Operation.SUBTRACT:
 			val = randi_range(2, 10)
-		GameConfig.Operation.MULTIPLY: 
+		GameConfig.Operation.MULTIPLY:
 			val = randi_range(2, 4) # Small numbers for multiply to prevent infinite growth
-		GameConfig.Operation.DIVIDE: 
+		GameConfig.Operation.DIVIDE:
 			val = randi_range(2, 3) # Divide by 2 or 3 only
 		GameConfig.Operation.LOG:
 			# We only want base 2 or base 10 usually, as they make the most sense mentally
 			var bases = [2, 10]
 			val = bases.pick_random()
-			
+		# RANDOM, SQRT: value is unused — outcome decided at trigger time
+
 	# 3. Apply to the Gate
 	gate.setup(operation, val)
 func spawn_chunk_of_type(type: ChunkType) -> Node3D:
@@ -168,8 +189,14 @@ func spawn_chunk_of_type(type: ChunkType) -> Node3D:
 	match type:
 		ChunkType.BOSS:
 			new_chunk = boss_chunk_scene.instantiate()
-			if new_chunk.has_method("setup_boss_stats"):
-				new_chunk.setup_boss_stats(difficulty_tier)
+			if new_chunk.has_method("configure_boss_scene") and boss_pool.bosses.size() > 0:
+				var random_index = randi_range(0,boss_pool.bosses.size()-2)
+				if random_index >= last_boss_index:
+					random_index += 1
+				new_chunk.configure_boss_scene(boss_pool.bosses[random_index].scene,difficulty_tier)
+				last_boss_index = random_index
+			elif boss_pool.bosses.size() <= 0:
+				push_error("Unable to spawn a boss because the boss pool has no bosses!")
 		ChunkType.GATE:
 			# ... (existing gate logic) ...
 			var random_scene = gate_chunk_scene.pick_random()
@@ -238,6 +265,14 @@ func on_boss_defeated():
 	# Fallback: If boss wasn't found (rare), switch at the horizon
 	if not boss_passed:
 		transition_z = active_chunks.back().position.z
+
+func _on_boss_fight_started():
+	print("boss fight started")
+	boss_fight_active = true
+
+func _on_boss_fight_ended():
+	boss_fight_active = false
+	on_boss_defeated()
 
 func perform_environment_transition():
 	# Reset the trigger so it doesn't fire every frame

@@ -9,6 +9,10 @@ signal died
 @export var attack_cooldown = 0.5
 var current_health = 100
 
+# Driven by EnemyManager once the fight starts. Captured at start_fight() so the
+# boss rides along at the player's forward speed without snapping.
+var follow_z_offset: float = 0.0
+
 func _ready():
 	current_health = max_health
 	# 1. STAY ATTACHED
@@ -19,7 +23,7 @@ func _ready():
 	# The player scans for the group "enemies", not "units".
 	add_to_group("enemies")
 
-func _process(delta):
+func _process(_delta):
 	# 1. TARGETING LOGIC
 	if not is_instance_valid(target_enemy) or target_enemy.is_queued_for_deletion():
 		target_enemy = find_priority_target()
@@ -90,17 +94,30 @@ func start_fight():
 	print("starting fight")
 	GameManager.started_boss_fight.emit()
 	GameManager.boss_health_updated.emit(current_health, max_health)
-	
-	# Optional: If the boss needs to move AROUND the arena, 
-	# you can enable movement here:
-	# set_as_top_level(true) 
-	# target_position = ...
+
+	# Detach from the chunk so we survive chunk recycling. Reparent to root and
+	# preserve the world position to avoid the transform snap that comes from
+	# flipping top_level while still under a non-root parent.
+	var tree := get_tree()
+	var root := tree.root
+	var player := tree.get_first_node_in_group("player") as Node3D
+	var world_pos := global_position
+	var old_parent := get_parent()
+	if old_parent != null and old_parent != root:
+		# Defer the reparent so we don't try to mutate the scene tree mid-signal
+		# (entered_arena fires from physics). reparent() also keeps global xform.
+		reparent(root)
+	set_as_top_level(true)
+	global_position = world_pos
+
+	if player:
+		follow_z_offset = global_position.z - player.global_position.z
+	add_to_group("bosses")
 
 func take_damage(amount):
 	current_health -= amount
 	GameManager.boss_health_updated.emit(current_health, max_health)
 	if current_health <= 0:
-		print("boss died")
 		die()
 
 func die():

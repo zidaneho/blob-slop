@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BossPool" format=3 uid="uid://ijnhmon4kcno"]
+
+[ext_resource type="Script" uid="uid://dj0dgcsju7gcr" path="res://components/blobs/bosses/BossData.gd" id="1_u3piy"]
+[ext_resource type="Script" uid="uid://cxhike2ilw36c" path="res://components/blobs/bosses/BossPool.gd" id="2_k6h4x"]
+[ext_resource type="Resource" uid="uid://cg62ild2s5ouf" path="res://components/blobs/bosses/crimson/crimson_data.tres" id="2_x10mx"]
+[ext_resource type="Resource" uid="uid://i1mponjtxt2s" path="res://components/blobs/bosses/crucible/crucible_data.tres" id="3_dbxhv"]
+[ext_resource type="Resource" uid="uid://b4abaubu5km84" path="res://components/blobs/bosses/overgrowth/overgrowth_data.tres" id="4_h4opv"]
+[ext_resource type="Resource" uid="uid://6l22fdp5p5db" path="res://components/blobs/bosses/cerulean/cerulean_unit.tres" id="5_badcn"]
+[ext_resource type="Resource" uid="uid://cohstb6x72ymn" path="res://components/blobs/bosses/corruption/corruption_data.tres" id="6_1hcwa"]
+[ext_resource type="Resource" uid="uid://cbk2vigeq5757" path="res://components/blobs/bosses/mad/mad_data.tres" id="7_cwnm1"]
+
+[resource]
+script = ExtResource("2_k6h4x")
+bosses = Array[ExtResource("1_u3piy")]([ExtResource("2_x10mx"), ExtResource("3_dbxhv"), ExtResource("4_h4opv"), ExtResource("5_badcn"), ExtResource("6_1hcwa"), ExtResource("7_cwnm1")])
+metadata/_custom_type_script = "uid://cxhike2ilw36c"

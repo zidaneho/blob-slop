@@ -1,6 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://ddlo8ktc7cwsy"]
+[gd_scene format=3 uid="uid://ddlo8ktc7cwsy"]
 
-[ext_resource type="Script" uid="uid://b6c50f463vh8h" path="res://components/blobs/boss_projectile.gd" id="1_mgovg"]
+[ext_resource type="Script" uid="uid://b6c50f463vh8h" path="res://components/blobs/bosses/boss_projectile.gd" id="1_mgovg"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_0t1mq"]
 radius = 1.0

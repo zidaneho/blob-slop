@@ -27,6 +27,10 @@ var is_game_active : bool = false
 var player_instance : Node3D
 
 func _ready() -> void:
+	var enemy_manager := EnemyManager.new()
+	enemy_manager.name = "EnemyManager"
+	add_child(enemy_manager)
+
 	GameManager.reset_score()
 	GameManager.score_updated.connect(_on_score_updated)
 	GameManager.high_score_updated.connect(_on_high_score_updated)
@@ -99,11 +103,16 @@ func _on_updated_unit_count(new_count : int):
 	stat_container.set_unit_count(new_count)
 func _on_game_over():
 	game_over()
-	
-	# 1. Show Game Over UI (You need to create this in your scene)
-	# $Canvas/GameOverScreen.visible = true
-	
-	# 2. Stop generating new chunks
+
+	# Tear down any active boss — it's top_level since start_fight() reparented
+	# it to root, so chunk teardown won't take it with us.
+	for boss in get_tree().get_nodes_in_group("bosses"):
+		if is_instance_valid(boss):
+			boss.queue_free()
+	if boss_health_bar:
+		boss_health_bar.visible = false
+
+	# Stop generating new chunks
 	if has_node("MapGen"):
 		$MapGen.set_process(false)
 		
